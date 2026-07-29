@@ -1,0 +1,1665 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Consolidación de órdenes</title>
+  <link href="https://unpkg.com/primeng@17.18.0/resources/themes/lara-light-blue/theme.css" rel="stylesheet">
+  <link href="https://unpkg.com/primeicons@7.0.0/primeicons.css" rel="stylesheet" crossorigin="anonymous">
+  <style>
+    :root {
+      --primary-color: #0d6efd;
+      --primary-color-hover: #0b5ed7;
+      --primary-color-active: #0a58ca;
+      --primary-color-text: #ffffff;
+      --primary-50: #eaf1fe;
+      --primary-100: #cfe2ff;
+      --focus-ring: rgba(13, 110, 253, 0.25);
+      --text-color: #212529;
+      --text-color-secondary: #6c757d;
+      --text-heading: #212529;
+      --surface-border: #dee2e6;
+      --surface-50: #f6f7f9;
+      --surface-100: #f3f4f6;
+      --surface-200: #e9ecef;
+      --surface-300: #ced4da;
+      --surface-700: #212529;
+      --surface-hover: #eef4ff;
+      --breadcrumb-link: #0d6efd;
+      --breadcrumb-link-hover: #0a58ca;
+      --breadcrumb-muted: #6c757d;
+      --btn-cancel: #6c757d;
+      --btn-cancel-hover: #5c636a;
+      --btn-success: #4caf50;
+      --btn-success-hover: #43a047;
+      --link-color: #0d6efd;
+      --link-hover: #0a58ca;
+      --danger-color: #dc3545;
+      --danger-hover: #bb2d3b;
+      --section-gap: 1rem;
+      --table-head-bg: #ffffff;
+      --table-head-text: #212529;
+      --table-border: #dee2e6;
+      --table-stripe: #f6f7f9;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      min-height: 100vh;
+      font-family: var(--font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
+      background: #fff;
+      color: var(--text-color);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .pi { font-style: normal; display: inline-block; min-width: 1em; line-height: 1; }
+
+    .page-shell { min-height: 100vh; display: flex; flex-direction: column; }
+    .page-content {
+      flex: 1;
+      max-width: 1200px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 1.5rem 2rem 2.5rem;
+    }
+    .page-content--wide { max-width: 1320px; }
+
+    .breadcrumb { font-size: 0.875rem; color: var(--breadcrumb-muted); margin-bottom: 0.75rem; }
+    .breadcrumb ol { display: flex; flex-wrap: wrap; align-items: center; gap: 0.35rem; list-style: none; }
+    .breadcrumb li + li::before { content: "/"; margin-right: 0.35rem; color: var(--breadcrumb-muted); }
+    .breadcrumb a { color: var(--breadcrumb-link); text-decoration: none; }
+    .breadcrumb a:hover { color: var(--breadcrumb-link-hover); text-decoration: underline; }
+    .breadcrumb li[aria-current="page"] { color: var(--breadcrumb-muted); }
+
+    .page-title { font-size: 1.8rem; font-weight: 600; color: var(--text-heading); margin-bottom: 1.25rem; }
+    .page-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+    }
+
+    .form-section { margin-bottom: 2rem; }
+    .section-head {
+      padding-bottom: 0.6rem;
+      margin-bottom: 1rem;
+      border-bottom: 1px solid var(--surface-200);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .section-title { font-size: 1.05rem; font-weight: 600; color: #334155; margin: 0; }
+
+    .field { display: flex; flex-direction: column; gap: 0.35rem; min-width: 0; }
+    .field-label { font-size: 0.875rem; font-weight: 500; color: var(--text-color); }
+    .required-mark { color: #dc2626; margin-left: 0.15rem; }
+    .field-hint { font-size: 0.75rem; color: var(--text-color-secondary); }
+    .field-error { font-size: 0.75rem; color: #dc2626; }
+
+    .form-input, .form-select {
+      width: 100%;
+      min-height: 2.375rem;
+      padding: 0.375rem 0.75rem;
+      font-size: 0.9rem;
+      border: 1px solid #ced4da;
+      border-radius: 0.25rem;
+      background: #fff;
+      color: var(--text-color);
+      font-family: inherit;
+    }
+    .form-input:focus, .form-select:focus {
+      outline: none;
+      border-color: #86b7fe;
+      box-shadow: 0 0 0 0.2rem var(--focus-ring);
+    }
+    .form-input.invalid, .form-select.invalid { border-color: #dc2626; box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.12); }
+
+    .form-actions { display: flex; gap: 0.5rem; margin-top: 1.75rem; flex-wrap: wrap; }
+    .btn {
+      padding: 0.45rem 0.9rem;
+      min-height: 2.375rem;
+      border: 1px solid transparent;
+      background: #fff;
+      border-radius: 0.25rem;
+      font-size: 0.9rem;
+      font-weight: 500;
+      font-family: inherit;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      transition: background-color .12s ease, border-color .12s ease, box-shadow .12s ease;
+    }
+    .btn:focus-visible { outline: none; box-shadow: 0 0 0 0.2rem var(--focus-ring); }
+    .btn-secondary { background: var(--btn-cancel); color: #fff; border-color: var(--btn-cancel); }
+    .btn-secondary:hover:not(:disabled) { background: var(--btn-cancel-hover); border-color: var(--btn-cancel-hover); }
+    .btn-success { background: var(--btn-success); color: #fff; border-color: var(--btn-success); }
+    .btn-success:hover:not(:disabled) { background: var(--btn-success-hover); border-color: var(--btn-success-hover); }
+    .btn-primary { background: var(--primary-color); color: #fff; border-color: var(--primary-color); }
+    .btn-primary:hover:not(:disabled) { background: var(--primary-color-hover); border-color: var(--primary-color-active); }
+    .btn-outlined { background: #fff; color: #212529; border-color: #ced4da; font-weight: 500; }
+    .btn-outlined:hover:not(:disabled) { background: #f8f9fa; border-color: #adb5bd; }
+    .btn-danger-outline { background: #fff; color: var(--danger-color); border-color: var(--danger-color); }
+    .btn-danger-outline:hover:not(:disabled) { background: #fdf2f3; border-color: var(--danger-hover); color: var(--danger-hover); }
+    .btn-danger { background: var(--danger-color); color: #fff; border-color: var(--danger-color); }
+    .btn-danger:hover:not(:disabled) { background: var(--danger-hover); border-color: var(--danger-hover); }
+    .btn:disabled { opacity: 0.55; cursor: not-allowed; pointer-events: none; }
+
+    .table-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.75rem;
+      padding-bottom: 0.75rem;
+      flex-wrap: wrap;
+      position: relative;
+      z-index: 40;
+    }
+    .table-toolbar__left, .table-toolbar__right { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
+    .table-toolbar__left { gap: 0.5rem; }
+
+    .btn-icon { padding: 0.45rem 0.7rem; gap: 0.4rem; }
+    .btn-icon .pi { font-size: 0.95rem; }
+    .btn-icon .pi-angle-down { font-size: 0.8rem; opacity: 0.9; }
+
+    /* Column chooser */
+    .col-chooser { position: relative; }
+    .col-chooser__panel {
+      position: absolute;
+      top: calc(100% + 0.35rem);
+      right: 0;
+      min-width: 260px;
+      background: #fff;
+      border: 1px solid var(--surface-200);
+      border-radius: 8px;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
+      padding: 0.5rem 0;
+      z-index: 55;
+    }
+    .col-chooser__panel.hidden { display: none; }
+    .col-chooser__title { padding: 0.3rem 1rem 0.5rem; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-color-secondary); font-weight: 700; }
+    .col-chooser__item { display: flex; align-items: center; gap: 0.6rem; padding: 0.4rem 1rem; font-size: 0.875rem; cursor: pointer; }
+    .col-chooser__item:hover { background: #f1f5f9; }
+    .col-chooser__item input { accent-color: var(--primary-color); width: 1rem; height: 1rem; }
+
+    /* Mostrar/Ocultar columnas (enlace + checkboxes en línea) */
+    .col-chooser-inline { display: inline-block; }
+    .col-chooser-link {
+      font-size: 0.875rem; color: var(--link-color); text-decoration: none; cursor: pointer;
+      display: inline-flex; align-items: center; gap: 0.35rem; font-weight: 500;
+    }
+    .col-chooser-link:hover { text-decoration: underline; color: var(--link-hover); }
+    .col-chooser-link .pi { font-size: 0.75rem; }
+    .col-chooser-inline__panel { margin: 0.6rem 0 0.25rem; }
+    .col-chooser-inline__panel.hidden { display: none; }
+    .col-chooser-inline__items { display: flex; flex-wrap: wrap; gap: 0.55rem 1.5rem; margin-bottom: 0.85rem; }
+    .col-chooser-inline__item { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.875rem; cursor: pointer; }
+    .col-chooser-inline__item input { accent-color: var(--primary-color); width: 1rem; height: 1rem; }
+
+    /* Export menu */
+    .export-menu { position: relative; }
+    .export-menu__panel {
+      position: absolute; top: calc(100% + 0.35rem); right: 0; min-width: 220px;
+      background: #fff; border: 1px solid var(--surface-200); border-radius: 8px;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12); padding: 0.4rem 0; z-index: 50;
+    }
+    .export-menu__panel.hidden { display: none; }
+    .export-menu__item {
+      display: flex; align-items: center; gap: 0.7rem; width: 100%; padding: 0.55rem 1.1rem;
+      border: none; background: transparent; font-family: inherit; font-size: 0.9rem; color: #212529;
+      text-align: left; cursor: pointer;
+    }
+    .export-menu__item:hover { background: #f1f5f9; }
+    .export-menu__item .pi { font-size: 1.05rem; width: 1.2rem; text-align: center; flex-shrink: 0; }
+    .export-menu__icon--blue { color: #3b82f6; }
+    .export-menu__icon--grey { color: #64748b; }
+    .export-menu__icon--red { color: #dc3545; }
+    .export-menu__icon--green { color: #217346; }
+    #exportBtn[aria-expanded="true"] { background: #6c757d; border-color: #6c757d; color: #fff; }
+
+    .card { background: #fff; border-radius: 0; box-shadow: none; overflow: visible; margin-top: 0; }
+    .data-table-scroll-pane { width: 100%; overflow-x: auto; }
+    .data-table { border-collapse: collapse; font-size: 0.875rem; width: 100%; min-width: 1080px; background: #fff; }
+    .data-table th, .data-table td {
+      padding: 0.55rem 0.75rem;
+      text-align: center;
+      border: 1px solid var(--table-border);
+      vertical-align: middle;
+    }
+    .data-table thead tr.header-row { background: var(--table-head-bg); }
+    .data-table thead tr.header-row th {
+      font-weight: 700;
+      color: var(--link-color);
+      font-size: 0.875rem;
+      text-align: left;
+      border-bottom: 2px solid var(--table-border);
+      white-space: normal;
+    }
+    .data-table thead tr.header-row th.sortable .col-header-text { cursor: pointer; }
+    .data-table thead tr.header-row th.sortable .col-header-text:hover { text-decoration: underline; }
+    .col-header-content { display: inline-flex; align-items: center; gap: 0.375rem; max-width: 100%; width: 100%; justify-content: space-between; }
+    .col-header-text { white-space: normal; line-height: 1.3; }
+    .col-header-left { display: inline-flex; align-items: center; gap: 0.35rem; min-width: 0; }
+    .sort-icon { font-size: 0.75rem; color: var(--link-color); flex-shrink: 0; }
+    .data-table thead tr.filter-row th { background: var(--table-head-bg); border-top: none; padding: 6px 8px; text-align: center; font-weight: 400; vertical-align: middle; }
+    .col-filter-btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 2.1rem; height: 2.1rem; padding: 0;
+      border: 1px solid transparent; border-radius: 6px;
+      background: transparent; color: #495057; cursor: pointer; font-size: 0.85rem; line-height: 1;
+    }
+    .col-filter-btn:hover { background: #f1f5f9; }
+    .col-filter-btn.is-open { background: #e9ecef; }
+    .col-filter-btn.is-active { color: var(--primary-color); }
+    .col-filter-btn.is-active.is-open { background: #e7f1ff; }
+
+    .data-table tbody tr { background: #fff; color: var(--text-color); }
+    .data-table tbody tr:nth-child(odd) { background: var(--table-stripe); }
+    .data-table tbody tr:hover td { background: var(--surface-hover); }
+    .data-table td.col-actions { width: 150px; white-space: nowrap; }
+    .data-table td.check-cell, .data-table th.check-cell { width: 46px; text-align: center; }
+    .data-table thead tr.header-row th.check-cell { text-align: center; }
+    .data-table thead tr.header-row th.check-cell { text-align: center; }
+    .data-table thead tr.header-row th.check-cell .sel-checkbox { display: inline-block; vertical-align: middle; }
+    .data-table td.expander-cell, .data-table th.expander-cell { width: 42px; text-align: center; }
+    .data-table thead tr.header-row th.expander-cell { text-align: center; }
+    .col-hidden { display: none !important; }
+
+    .row-actions { display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
+    .table-action-btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: auto; height: auto; padding: 0; border: none; background: transparent;
+      color: var(--link-color); cursor: pointer; font-size: 1rem;
+    }
+    .table-action-btn:hover { color: var(--link-hover); }
+    .table-action-btn--danger { color: var(--danger-color); }
+    .table-action-btn--danger:hover { color: var(--danger-hover); }
+    /* Tooltip flotante gestionado por JS (evita recortes del contenedor con scroll) */
+    .app-tooltip {
+      position: fixed;
+      z-index: 2000;
+      background: #212529;
+      color: #fff;
+      padding: 0.3rem 0.55rem;
+      border-radius: 4px;
+      font-size: 0.72rem;
+      font-weight: 500;
+      line-height: 1.2;
+      white-space: nowrap;
+      pointer-events: none;
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.25);
+      opacity: 0;
+      transition: opacity .1s ease;
+    }
+    .app-tooltip.is-visible { opacity: 1; }
+    .app-tooltip::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 5px solid transparent;
+    }
+    .app-tooltip[data-placement="top"]::after { top: 100%; border-top-color: #212529; }
+    .app-tooltip[data-placement="bottom"]::after { bottom: 100%; border-bottom-color: #212529; }
+
+    .row-expander { border: none; background: transparent; cursor: pointer; color: var(--link-color); font-size: 0.95rem; padding: 0; }
+    .expand-row > td { background: #fff !important; padding: 0 !important; border-top: none; }
+    .expand-row:hover > td { background: #fff !important; }
+    .expand-inner { padding: 1rem 1.25rem; background: #fbfcfe; border-top: 1px solid var(--table-border); }
+    .expand-inner__title { font-size: 0.85rem; font-weight: 700; color: #334155; margin-bottom: 0.6rem; }
+    .expand-head { position: relative; display: flex; align-items: center; min-height: 1.4rem; margin-bottom: 0.6rem; }
+    .expand-head__count { font-size: 0.875rem; color: var(--text-color); position: relative; z-index: 1; }
+    .expand-head__title { position: absolute; left: 0; right: 0; text-align: center; font-size: 0.85rem; font-weight: 700; color: #334155; pointer-events: none; }
+
+    .sel-checkbox { accent-color: var(--primary-color); width: 1rem; height: 1rem; cursor: pointer; }
+    .selectable-row.is-consolidated td { background: #f5f6f8 !important; color: #9aa4b2; }
+    .selectable-row.is-consolidated:hover td { background: #f0f1f3 !important; }
+
+    .badge { display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.15rem 0.55rem; border-radius: 999px; font-size: 0.72rem; font-weight: 600; white-space: nowrap; }
+    .badge--active { background: #e6f4ea; color: #1e7e34; }
+    .badge--registrada { background: #e7f1ff; color: #0a58ca; }
+    .badge--consolidada { background: #f1f3f5; color: #6c757d; }
+    .badge--revertida { background: #fdeaea; color: #b02a37; }
+
+    .table-paginator { display: flex; align-items: center; justify-content: center; padding: 0.85rem 0 0; border-top: none; background: transparent; }
+    .table-paginator__cluster { display: inline-flex; align-items: center; gap: 0; }
+    .table-paginator__pages { display: inline-flex; align-items: center; gap: 0; }
+    .table-pag-btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      min-width: 2rem; height: 2rem; padding: 0 0.5rem; border: 1px solid #dee2e6;
+      margin-left: -1px; border-radius: 0; background: #fff; color: var(--link-color); cursor: pointer; font-size: 0.875rem;
+    }
+    #pagFirst { border-top-left-radius: 0.25rem; border-bottom-left-radius: 0.25rem; margin-left: 0; }
+    #pagLast { border-top-right-radius: 0.25rem; border-bottom-right-radius: 0.25rem; }
+    .table-pag-btn:hover:not(:disabled) { background: #e9ecef; color: var(--link-hover); z-index: 1; }
+    .table-pag-btn.is-active { background: var(--primary-color); color: #fff; border-color: var(--primary-color); font-weight: 600; z-index: 2; }
+    .table-pag-btn:disabled { color: #adb5bd; background: #fff; cursor: default; pointer-events: none; }
+    .table-paginator__select { height: 2rem; border: 1px solid #ced4da; border-radius: 0.25rem; font-size: 0.875rem; padding: 0 0.5rem; margin-left: 0.75rem; }
+    .grid-summary { font-size: 0.875rem; color: var(--text-color); margin: 0 0 0.5rem; }
+
+    .info-callout { display: flex; align-items: flex-start; gap: 0.6rem; font-size: 0.875rem; color: #64748b; margin-bottom: 1.25rem; }
+    .info-callout .pi { color: #94a3b8; font-size: 1rem; margin-top: 0.1rem; flex-shrink: 0; }
+    .info-callout__title { font-weight: 700; color: #475569; }
+    .info-callout__detail { color: var(--text-color); }
+
+    .meta-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem 1.5rem; margin-bottom: 1.5rem; }
+    .meta-item__label { font-size: 0.75rem; color: var(--text-color-secondary); margin-bottom: 0.2rem; }
+    .meta-item__value { font-size: 0.875rem; font-weight: 500; color: #334155; }
+
+    .detail-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; border: 1px solid var(--table-border); margin-bottom: 1.75rem; }
+    .detail-table th, .detail-table td { border: 1px solid var(--table-border); padding: 0.6rem 0.85rem; vertical-align: middle; }
+    .detail-table tbody tr:nth-child(odd) { background: var(--table-stripe); }
+    .detail-table th { width: 35%; color: var(--surface-700); font-weight: 700; text-align: left; }
+    .detail-table td { text-align: left; color: var(--text-color); }
+
+    .detail-count { font-size: 0.875rem; color: var(--text-color); margin-bottom: 0.5rem; }
+    .detail-dept-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; border: 1px solid var(--table-border); }
+    .detail-dept-table th, .detail-dept-table td { padding: 0.55rem 0.85rem; border: 1px solid var(--table-border); text-align: left; }
+    .detail-dept-table thead th { background: #fff; color: var(--link-color); font-weight: 700; cursor: default; white-space: nowrap; border-bottom-width: 2px; }
+    .detail-dept-table tbody tr:nth-child(odd) { background: var(--table-stripe); }
+
+    .view-hidden { display: none !important; }
+    .hidden { display: none !important; }
+
+    /* Filter popover */
+    .filter-popover {
+      position: absolute; z-index: 1250; width: 288px; background: #fff;
+      border: 1px solid var(--surface-200); border-radius: 8px;
+      box-shadow: 0 12px 32px rgba(15, 23, 42, 0.18); padding: 0.9rem;
+    }
+    .filter-popover.hidden { display: none; }
+    .filter-popover__row { display: flex; flex-direction: column; gap: 0.3rem; margin-bottom: 0.7rem; }
+    .filter-popover__label { font-size: 0.8rem; font-weight: 500; color: var(--text-color); }
+    .filter-popover__hint { font-size: 0.72rem; color: var(--text-color-secondary); }
+    .filter-popover__error { font-size: 0.75rem; color: #dc2626; margin-bottom: 0.6rem; }
+    .filter-popover__actions { display: flex; justify-content: flex-end; align-items: center; gap: 0.75rem; }
+    .filter-popover__actions .btn { min-height: 2rem; padding: 0.35rem 0.85rem; font-size: 0.85rem; }
+    .btn-plain { background: transparent; border-color: transparent; color: #212529; }
+    .btn-plain:hover:not(:disabled) { background: transparent; color: #000; text-decoration: underline; }
+    .btn-plain:disabled { color: #adb5bd; }
+
+    .modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.45); z-index: 1200; display: flex; align-items: center; justify-content: center; padding: 1rem; }
+    .modal-overlay.hidden { display: none; }
+    .modal-card { background: #fff; border-radius: 8px; box-shadow: 0 16px 40px rgba(15, 23, 42, 0.2); width: 100%; max-width: 420px; padding: 1.25rem; }
+    .modal-card--wide { max-width: 480px; }
+    .modal-card--preview { max-width: 720px; }
+    .modal-card__head { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.75rem; }
+    .modal-card__icon { flex-shrink: 0; width: 1.5rem; height: 1.5rem; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; color: #fff; font-size: 0.8rem; }
+    .modal-card__icon--question { background: var(--primary-color); }
+    .modal-card__icon--warn { background: #f0ad4e; }
+    .modal-card__head .modal-card__title { margin-bottom: 0; }
+    .modal-card__title { font-size: 1rem; font-weight: 600; color: #334155; margin-bottom: 0.75rem; }
+    .modal-card__body { font-size: 0.875rem; color: var(--text-color); margin-bottom: 1.25rem; line-height: 1.5; }
+    .modal-card__actions { display: flex; justify-content: flex-end; gap: 0.5rem; }
+    .preview-block { margin-bottom: 1rem; }
+    .preview-block__title { font-size: 0.85rem; font-weight: 700; color: #334155; margin-bottom: 0.5rem; }
+
+    /* PrimeNG Toast (core structure; colors from Lara theme) */
+    .p-toast { position: fixed; top: 20px; right: 20px; width: 25rem; max-width: calc(100% - 40px); z-index: 1300; }
+    .p-toast .p-toast-message { margin: 0 0 1rem 0; overflow: hidden; }
+    .p-toast .p-toast-message-content { display: flex; align-items: flex-start; }
+    .p-toast .p-toast-message-text { flex: 1 1 auto; }
+    .p-toast .p-toast-message .p-toast-message-content { padding: 1rem 1rem 1rem 1.25rem; }
+    .p-toast .p-toast-message .p-toast-message-content .p-toast-message-icon { font-size: 1.25rem; margin-top: 0.15rem; }
+    .p-toast .p-toast-message .p-toast-message-content .p-toast-message-text { margin: 0 0 0 0.75rem; }
+    .p-toast .p-toast-icon-close { display: flex; align-items: center; justify-content: center; flex-shrink: 0; width: 2rem; height: 2rem; border: none; background: transparent; cursor: pointer; border-radius: 50%; }
+
+    .page-footer { margin-top: auto; padding: 0.65rem 1rem; text-align: center; font-size: 0.8rem; color: #9ca3af; background: #f3f4f6; border-top: 1px solid #e5e7eb; }
+
+    @media (max-width: 900px) {
+      .meta-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 640px) {
+      .page-content { padding: 1rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-shell">
+    <main class="page-content page-content--wide" id="mainContent">
+
+      <!-- LISTADO DE CONSOLIDACIONES -->
+      <div id="listView">
+        <nav class="breadcrumb" aria-label="Ruta de navegación">
+          <ol>
+            <li><a href="#">Órdenes</a></li>
+            <li aria-current="page">Consolidación de órdenes</li>
+          </ol>
+        </nav>
+        <div class="page-header-row">
+          <h1 class="page-title" style="margin-bottom:0">Consolidación de órdenes</h1>
+        </div>
+
+        <div class="table-toolbar">
+          <div class="table-toolbar__left" style="flex-direction:column; align-items:flex-start; gap:0.6rem;">
+            <button type="button" class="btn btn-success" id="goCreateBtn">Crear consolidación de órdenes</button>
+            <div class="col-chooser-inline" id="listColChooser">
+              <a href="#" class="col-chooser-link" id="listColChooserBtn" role="button" aria-expanded="false" aria-controls="listColChooserPanel">Mostrar/Ocultar Columnas</a>
+            </div>
+          </div>
+          <div class="table-toolbar__right">
+            <div class="export-menu">
+              <button type="button" class="btn btn-outlined btn-icon" id="exportBtn" aria-haspopup="true" aria-expanded="false" aria-controls="exportMenuPanel" title="Exportar registros">
+                <i class="pi pi-external-link" aria-hidden="true"></i>
+                <i class="pi pi-angle-down" aria-hidden="true"></i>
+              </button>
+              <div id="exportMenuPanel" class="export-menu__panel hidden" role="menu" aria-label="Exportar registros"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-chooser-inline__panel hidden" id="listColChooserPanel"></div>
+
+        <div class="grid-summary" id="listSummary"></div>
+
+        <div class="card">
+          <div class="data-table-scroll-pane">
+            <table class="data-table" id="listTable">
+              <thead>
+                <tr class="header-row" id="listTableHead"></tr>
+                <tr class="filter-row" id="listTableFilterRow"></tr>
+              </thead>
+              <tbody id="listTableBody"></tbody>
+            </table>
+          </div>
+          <nav class="table-paginator" aria-label="Paginación">
+            <div class="table-paginator__cluster">
+              <button type="button" class="table-pag-btn" id="pagFirst" aria-label="Primera página"><i class="pi pi-angle-double-left"></i></button>
+              <button type="button" class="table-pag-btn" id="pagPrev" aria-label="Página anterior"><i class="pi pi-angle-left"></i></button>
+              <div class="table-paginator__pages" id="pagPages"></div>
+              <button type="button" class="table-pag-btn" id="pagNext" aria-label="Página siguiente"><i class="pi pi-angle-right"></i></button>
+              <button type="button" class="table-pag-btn" id="pagLast" aria-label="Última página"><i class="pi pi-angle-double-right"></i></button>
+              <select id="pageSizeSelect" class="table-paginator__select" aria-label="Registros por página">
+                <option value="5">5</option>
+                <option value="10">10</option>
+                <option value="25">25</option>
+              </select>
+            </div>
+          </nav>
+        </div>
+      </div>
+
+      <!-- CREAR CONSOLIDACIÓN -->
+      <div id="createView" class="view-hidden">
+        <nav class="breadcrumb" aria-label="Ruta de navegación">
+          <ol>
+            <li><a href="#" data-nav="list">Órdenes</a></li>
+            <li><a href="#" data-nav="list">Consolidación de órdenes</a></li>
+            <li aria-current="page">Órdenes a consolidar</li>
+          </ol>
+        </nav>
+        <h1 class="page-title">Órdenes a consolidar</h1>
+
+        <section class="form-section">
+          <div class="section-head">
+            <h2 class="section-title">Órdenes registradas</h2>
+          </div>
+          <div class="info-callout" role="note">
+            <i class="pi pi-info-circle" aria-hidden="true"></i>
+            <div>
+              <div class="info-callout__title">Selecciona al menos dos órdenes para consolidar.</div>
+              <div class="info-callout__detail">Las órdenes ya consolidadas se muestran deshabilitadas y no pueden seleccionarse. Todas las órdenes a consolidar deben pertenecer al mismo consignatario y al mismo departamento.</div>
+            </div>
+          </div>
+          <div class="grid-summary" id="availSummary"></div>
+          <div class="card">
+            <div class="data-table-scroll-pane">
+              <table class="data-table" id="availTable">
+                <thead><tr class="header-row" id="availTableHead"></tr></thead>
+                <tbody id="availTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" data-nav="list">Cancelar</button>
+          <button type="button" class="btn btn-success" id="consolidateBtn" disabled>Consolidar</button>
+        </div>
+      </div>
+
+      <!-- DETALLE DE CONSOLIDACIÓN -->
+      <div id="detailView" class="view-hidden">
+        <nav class="breadcrumb" aria-label="Ruta de navegación">
+          <ol>
+            <li><a href="#" data-nav="list">Órdenes</a></li>
+            <li><a href="#" data-nav="list">Consolidación de órdenes</a></li>
+            <li aria-current="page" id="detailBreadcrumbCurrent">Detalle de consolidación</li>
+          </ol>
+        </nav>
+        <h1 class="page-title" id="detailPageTitle">Detalle de consolidación</h1>
+        <div class="page-header-row" style="margin-bottom:1.25rem">
+          <button type="button" class="btn btn-danger" id="detailRevertBtn">Revertir consolidado</button>
+        </div>
+        <div id="detailFormRoot"></div>
+      </div>
+
+    </main>
+    <footer class="page-footer">3.35.134 ©Netlogistik 2026</footer>
+  </div>
+
+  <!-- Modal confirmación revertir MSG047 -->
+  <div id="revertModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="revertModalTitle">
+    <div class="modal-card">
+      <div class="modal-card__title" id="revertModalTitle">Revertir consolidado</div>
+      <div class="modal-card__body" id="revertModalBody"></div>
+      <div class="modal-card__actions">
+        <button type="button" class="btn btn-secondary" id="revertCancelBtn">Cancelar</button>
+        <button type="button" class="btn btn-danger" id="revertConfirmBtn">Revertir</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal vista previa consolidación MSG045 -->
+  <div id="previewModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="previewModalTitle">
+    <div class="modal-card modal-card--preview">
+      <div class="modal-card__title" id="previewModalTitle">Confirmar consolidación de órdenes</div>
+      <div class="modal-card__body" id="previewModalBody"></div>
+      <div class="modal-card__actions">
+        <button type="button" class="btn btn-secondary" id="previewCancelBtn">Cancelar</button>
+        <button type="button" class="btn btn-success" id="previewConfirmBtn">Confirmar consolidación</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Popover de filtro por columna -->
+  <div id="filterPopover" class="filter-popover hidden" role="dialog" aria-label="Filtro de columna">
+    <div class="filter-popover__row">
+      <label class="filter-popover__label" for="filterPopoverOp">Filtro</label>
+      <select id="filterPopoverOp" class="form-select"></select>
+    </div>
+    <div class="filter-popover__row">
+      <label class="filter-popover__label" for="filterPopoverValue">Valor</label>
+      <input id="filterPopoverValue" type="text" class="form-input" autocomplete="off">
+      <span class="filter-popover__hint" id="filterPopoverHint"></span>
+    </div>
+    <div class="filter-popover__error" id="filterPopoverError" hidden></div>
+    <div class="filter-popover__actions">
+      <button type="button" class="btn btn-plain" id="filterPopoverClear">Limpiar</button>
+      <button type="button" class="btn btn-primary" id="filterPopoverApply" disabled>Aplicar</button>
+    </div>
+  </div>
+
+  <div id="toast" class="p-toast p-toast-top-right" role="region" aria-live="polite"></div>
+
+  <script>
+    (function () {
+      var STORAGE_KEY = 'opsOrderConsolidation_v2';
+      var CURRENT_USER = 'admin.wms';
+
+      /* ---------- Catálogos ---------- */
+      var CONSIGNATARIOS = [
+        { id: 'CON-001', nombre: 'Grupo Comercial del Norte' },
+        { id: 'CON-002', nombre: 'Distribuidora Península' },
+        { id: 'CON-003', nombre: 'Abarrotes del Bajío' },
+        { id: 'CON-004', nombre: 'Consorcio Retail Centro' }
+      ];
+      var DEPARTAMENTOS = [
+        { id: 'DEP-01', nombre: 'Abarrotes' },
+        { id: 'DEP-02', nombre: 'Perecederos' },
+        { id: 'DEP-04', nombre: 'Panadería' },
+        { id: 'DEP-05', nombre: 'Limpieza' }
+      ];
+      function consignatarioName(id) { var c = CONSIGNATARIOS.find(function (x) { return x.id === id; }); return c ? c.nombre : id; }
+      function deptName(id) { var d = DEPARTAMENTOS.find(function (x) { return x.id === id; }); return d ? d.nombre : id; }
+
+      /* ---------- Mensajes de sistema (textos placeholder por catálogo pendiente) ---------- */
+      var MSG = {
+        MSG045: '¿Estás seguro que deseas consolidar las órdenes?',
+        MSG046: 'La consolidación de órdenes de realizó con éxito.',
+        MSG047: 'La orden consolidada se eliminará y las órdenes originales volverán a estar disponibles.',
+        MSG048: 'La consolidación se revirtió correctamente.'
+      };
+
+      /* ---------- Formatos de fecha ---------- */
+      function formatDateTime(iso) {
+        if (!iso) return '—';
+        return new Date(iso).toLocaleString('es-MX', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
+      }
+      function formatDateTimeLong(iso) {
+        if (!iso) return '—';
+        return new Date(iso).toLocaleString('es-MX', { day: 'numeric', month: 'long', year: 'numeric', hour: 'numeric', minute: '2-digit', second: '2-digit', timeZoneName: 'short' });
+      }
+
+      function recordsSummary(start, end, total) {
+        if (!total) return 'No se encontraron resultados.';
+        return 'Mostrando ' + start + '-' + end + ' de ' + total + ' elementos';
+      }
+
+      /* ---------- Datos semilla ---------- */
+      function seedData() {
+        function d(y, m, day, h, mi) { return new Date(y, m, day, h, mi, 0).toISOString(); }
+        var orders = [
+          { id: 'OC-1001', nombre: 'Orden Abarrotes A1', version: 'v1', estado: 'Registrada', consignatario: 'CON-001', departamento: 'DEP-01', unidad: 'UN-Centro', createdAt: d(2026, 4, 3, 9, 15), updatedAt: d(2026, 5, 2, 11, 30), updatedBy: 'jperez', consolidatedInto: null },
+          { id: 'OC-1002', nombre: 'Orden Abarrotes A2', version: 'v1', estado: 'Registrada', consignatario: 'CON-001', departamento: 'DEP-01', unidad: 'UN-Centro', createdAt: d(2026, 4, 5, 10, 5), updatedAt: d(2026, 5, 3, 9, 45), updatedBy: 'mlopez', consolidatedInto: null },
+          { id: 'OC-1003', nombre: 'Orden Abarrotes A3', version: 'v2', estado: 'Registrada', consignatario: 'CON-001', departamento: 'DEP-01', unidad: 'UN-Centro', createdAt: d(2026, 4, 8, 8, 40), updatedAt: d(2026, 5, 4, 16, 10), updatedBy: 'admin.wms', consolidatedInto: null },
+          { id: 'OC-1004', nombre: 'Orden Perecederos B1', version: 'v1', estado: 'Registrada', consignatario: 'CON-001', departamento: 'DEP-02', unidad: 'UN-Centro', createdAt: d(2026, 4, 9, 13, 20), updatedAt: d(2026, 5, 6, 12, 0), updatedBy: 'rgarcia', consolidatedInto: null },
+          { id: 'OC-1005', nombre: 'Orden Perecederos B2', version: 'v1', estado: 'Registrada', consignatario: 'CON-001', departamento: 'DEP-02', unidad: 'UN-Centro', createdAt: d(2026, 4, 11, 14, 55), updatedAt: d(2026, 5, 7, 10, 25), updatedBy: 'jperez', consolidatedInto: null },
+          { id: 'OC-1006', nombre: 'Orden Lácteos C1', version: 'v1', estado: 'Registrada', consignatario: 'CON-002', departamento: 'DEP-01', unidad: 'UN-Norte', createdAt: d(2026, 4, 12, 9, 0), updatedAt: d(2026, 5, 8, 15, 40), updatedBy: 'acastillo', consolidatedInto: null },
+          { id: 'OC-1007', nombre: 'Orden Lácteos C2', version: 'v1', estado: 'Registrada', consignatario: 'CON-002', departamento: 'DEP-01', unidad: 'UN-Norte', createdAt: d(2026, 4, 14, 11, 30), updatedAt: d(2026, 5, 9, 8, 15), updatedBy: 'mlopez', consolidatedInto: null },
+          { id: 'OC-1008', nombre: 'Orden Limpieza D1', version: 'v3', estado: 'Registrada', consignatario: 'CON-003', departamento: 'DEP-05', unidad: 'UN-Sur', createdAt: d(2026, 4, 16, 16, 45), updatedAt: d(2026, 5, 10, 13, 5), updatedBy: 'rgarcia', consolidatedInto: null },
+          { id: 'OC-1009', nombre: 'Orden Panadería E1', version: 'v1', estado: 'Consolidada', consignatario: 'CON-004', departamento: 'DEP-04', unidad: 'UN-Bajío', createdAt: d(2026, 3, 20, 10, 0), updatedAt: d(2026, 4, 28, 17, 20), updatedBy: 'admin.wms', consolidatedInto: '2026-OC-1', prevEstado: 'Registrada' },
+          { id: 'OC-1010', nombre: 'Orden Panadería E2', version: 'v1', estado: 'Consolidada', consignatario: 'CON-004', departamento: 'DEP-04', unidad: 'UN-Bajío', createdAt: d(2026, 3, 22, 12, 10), updatedAt: d(2026, 4, 28, 17, 20), updatedBy: 'admin.wms', consolidatedInto: '2026-OC-1', prevEstado: 'Registrada' }
+        ];
+        var consolidations = [
+          {
+            id: '2026-OC-1', nombre: '2026-OC-1', estado: 'Activa', unidad: 'UN-Bajío',
+            consignatario: 'CON-004', departamento: 'DEP-04',
+            childrenIds: ['OC-1009', 'OC-1010'],
+            createdAt: d(2026, 4, 28, 17, 20), updatedAt: d(2026, 4, 28, 17, 20), updatedBy: 'admin.wms'
+          }
+        ];
+
+        /* Consolidaciones adicionales (con sus órdenes hijas) para poblar el listado y la paginación. */
+        var consCons = ['CON-001', 'CON-002', 'CON-003', 'CON-004'];
+        var consDeps = ['DEP-01', 'DEP-02', 'DEP-04', 'DEP-05'];
+        var consUnits = ['UN-Centro', 'UN-Norte', 'UN-Sur', 'UN-Bajío'];
+        var consUsers = ['jperez', 'mlopez', 'admin.wms', 'rgarcia', 'acastillo'];
+        var childSeq = 2001;
+        for (var k = 2; k <= 13; k++) {
+          var cons = consCons[k % consCons.length];
+          var dep = consDeps[k % consDeps.length];
+          var uni = consUnits[k % consUnits.length];
+          var user = consUsers[k % consUsers.length];
+          var childCount = 2 + (k % 2); /* 2 o 3 */
+          var childIds = [];
+          var cCreated = d(2026, 3, 3 + k, 9 + (k % 8), 10);
+          var cUpdated = d(2026, 5, 1 + (k % 24), 10 + (k % 9), 25);
+          for (var c = 0; c < childCount; c++) {
+            var oid = 'OC-' + childSeq; childSeq++;
+            orders.push({
+              id: oid,
+              nombre: 'Orden ' + deptName(dep) + ' ' + oid,
+              version: 'v1',
+              estado: 'Consolidada',
+              consignatario: cons,
+              departamento: dep,
+              unidad: uni,
+              createdAt: d(2026, 2, 5 + k, 8 + (c % 6), 30),
+              updatedAt: cUpdated,
+              updatedBy: user,
+              consolidatedInto: '2026-OC-' + k,
+              prevEstado: 'Registrada'
+            });
+            childIds.push(oid);
+          }
+          consolidations.push({
+            id: '2026-OC-' + k, nombre: '2026-OC-' + k, estado: 'Activa', unidad: uni,
+            consignatario: cons, departamento: dep, childrenIds: childIds,
+            createdAt: cCreated, updatedAt: cUpdated, updatedBy: user
+          });
+        }
+
+        return { orders: orders, consolidations: consolidations };
+      }
+
+      var Store = {
+        load: function () {
+          try {
+            var raw = localStorage.getItem(STORAGE_KEY);
+            if (!raw) { var seed = seedData(); localStorage.setItem(STORAGE_KEY, JSON.stringify(seed)); return seed; }
+            var data = JSON.parse(raw);
+            if (!data.orders || !data.consolidations) { var s = seedData(); localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); return s; }
+            return data;
+          } catch (e) { return seedData(); }
+        },
+        save: function (data) { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); },
+        getOrders: function () { return Store.load().orders; },
+        getConsolidations: function () { return Store.load().consolidations; },
+        orderById: function (id) { return Store.getOrders().find(function (o) { return o.id === id; }) || null; },
+        consolidationById: function (id) { return Store.getConsolidations().find(function (c) { return c.id === id; }) || null; }
+      };
+
+      /* Órdenes disponibles para consolidar (no consolidadas). */
+      function availableOrders() {
+        return Store.getOrders().filter(function (o) { return !o.consolidatedInto && o.estado !== 'Consolidada'; });
+      }
+      /* Todas las órdenes registradas (para la tabla del creador). */
+      function registeredOrders() { return Store.getOrders(); }
+      function isOrderConsolidated(o) { return !!o.consolidatedInto || o.estado === 'Consolidada'; }
+
+      /* Folio autogenerado: AÑO-OC-N, menor incremental libre del año. */
+      function nextFolio() {
+        var year = new Date().getFullYear();
+        var prefix = year + '-OC-';
+        var used = {};
+        Store.getConsolidations().forEach(function (c) {
+          if (c.id.indexOf(prefix) === 0) {
+            var n = parseInt(c.id.slice(prefix.length), 10);
+            if (!isNaN(n)) used[n] = true;
+          }
+        });
+        var n = 1;
+        while (used[n]) n++;
+        return prefix + n;
+      }
+
+      function escapeHtml(s) {
+        return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+          return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+        });
+      }
+
+      /* ---------- Toast ---------- */
+      function showToast(detail, summary, severity) {
+        severity = severity || 'success';
+        var iconMap = { success: 'pi-check', info: 'pi-info-circle', warn: 'pi-exclamation-triangle', error: 'pi-times-circle' };
+        var container = document.getElementById('toast');
+        var msg = document.createElement('div');
+        msg.className = 'p-toast-message p-toast-message-' + severity + ' p-toast-message-enter-done';
+        msg.setAttribute('role', 'alert');
+        msg.innerHTML =
+          '<div class="p-toast-message-content">' +
+            '<span class="p-toast-message-icon pi ' + (iconMap[severity] || 'pi-check') + '"></span>' +
+            '<div class="p-toast-message-text">' +
+              '<span class="p-toast-summary">' + escapeHtml(summary || '') + '</span>' +
+              '<div class="p-toast-detail">' + escapeHtml(detail) + '</div>' +
+            '</div>' +
+            '<button type="button" class="p-toast-icon-close p-link" aria-label="Cerrar">' +
+              '<span class="p-toast-icon-close-icon pi pi-times"></span>' +
+            '</button>' +
+          '</div>';
+        container.appendChild(msg);
+        var close = function () { if (msg.parentNode) msg.parentNode.removeChild(msg); };
+        msg.querySelector('.p-toast-icon-close').addEventListener('click', close);
+        setTimeout(close, 4000);
+      }
+
+      /* ---------- Navegación de vistas ---------- */
+      function showView(name) {
+        ['listView', 'createView', 'detailView'].forEach(function (v) {
+          document.getElementById(v).classList.toggle('view-hidden', v !== name + 'View');
+        });
+        closeFilterPopover();
+        if (name === 'list') renderList();
+        window.scrollTo(0, 0);
+      }
+
+      /* ================================================================
+         LISTADO DE CONSOLIDACIONES
+      ================================================================ */
+      var LIST_COLUMNS = [
+        { key: 'id', label: 'Id', visible: true },
+        { key: 'nombre', label: 'Nombre', visible: true },
+        { key: 'estado', label: 'Estado', visible: true },
+        { key: 'unidad', label: 'Unidad', visible: true },
+        { key: 'updatedBy', label: 'Actualizado por', visible: true },
+        { key: 'updatedAt', label: 'Actualizado', visible: true },
+        { key: 'createdAt', label: 'Creado', visible: true }
+      ];
+      var DATE_KEYS = ['updatedAt', 'createdAt'];
+      var listState = { filters: {}, page: 1, pageSize: 10, sortKey: null, sortDir: 'asc' };
+      var expandedRows = {};
+
+      var FILTER_OPS = [
+        { id: 'contiene', label: 'Contiene' },
+        { id: 'inicia', label: 'Inicia con' },
+        { id: 'termina', label: 'Termina con' },
+        { id: 'igual', label: 'Igual a' },
+        { id: 'unode', label: 'Uno de' }
+      ];
+
+      function cellValue(row, key) {
+        if (DATE_KEYS.indexOf(key) >= 0) return formatDateTime(row[key]);
+        return row[key] == null ? '' : String(row[key]);
+      }
+
+      function matchFilter(value, op, raw) {
+        var v = String(value == null ? '' : value).toLowerCase();
+        if (op === 'unode') {
+          var terms = raw.split('\t').map(function (t) { return t.trim().toLowerCase(); }).filter(Boolean);
+          if (!terms.length) return true;
+          return terms.some(function (t) { return v === t; });
+        }
+        var term = raw.trim().toLowerCase();
+        if (!term) return true;
+        if (op === 'inicia') return v.indexOf(term) === 0;
+        if (op === 'termina') return v.length >= term.length && v.slice(v.length - term.length) === term;
+        if (op === 'igual') return v === term;
+        return v.indexOf(term) !== -1; /* contiene */
+      }
+
+      function getFilteredConsolidations() {
+        var rows = Store.getConsolidations().slice();
+        rows = rows.filter(function (row) {
+          return LIST_COLUMNS.every(function (col) {
+            var f = listState.filters[col.key];
+            if (!f || !f.active) return true;
+            return matchFilter(cellValue(row, col.key), f.op, f.value);
+          });
+        });
+        if (listState.sortKey) {
+          var key = listState.sortKey;
+          var mul = listState.sortDir === 'asc' ? 1 : -1;
+          rows.sort(function (a, b) {
+            if (DATE_KEYS.indexOf(key) >= 0) return (new Date(a[key]) - new Date(b[key])) * mul;
+            return String(a[key] == null ? '' : a[key]).localeCompare(String(b[key] == null ? '' : b[key]), 'es') * mul;
+          });
+        }
+        return rows;
+      }
+
+      function renderListHead() {
+        var head = document.getElementById('listTableHead');
+        var filterRow = document.getElementById('listTableFilterRow');
+        head.innerHTML = '';
+        filterRow.innerHTML = '';
+
+        var expTh = document.createElement('th');
+        expTh.className = 'expander-cell';
+        head.appendChild(expTh);
+        var expF = document.createElement('th');
+        expF.className = 'expander-cell';
+        filterRow.appendChild(expF);
+
+        LIST_COLUMNS.forEach(function (col) {
+          if (!col.visible) return;
+          var th = document.createElement('th');
+          th.className = 'sortable';
+          th.dataset.col = col.key;
+          var active = listState.filters[col.key] && listState.filters[col.key].active;
+          var sortIcon = '';
+          if (listState.sortKey === col.key) {
+            sortIcon = '<i class="pi ' + (listState.sortDir === 'asc' ? 'pi-sort-amount-up-alt' : 'pi-sort-amount-down') + ' sort-icon"></i>';
+          }
+          th.innerHTML =
+            '<span class="col-header-content">' +
+              '<span class="col-header-left">' +
+                '<span class="col-header-text">' + escapeHtml(col.label) + '</span>' + sortIcon +
+              '</span>' +
+            '</span>';
+          th.querySelector('.col-header-text').addEventListener('click', function () {
+            if (listState.sortKey === col.key) listState.sortDir = listState.sortDir === 'asc' ? 'desc' : 'asc';
+            else { listState.sortKey = col.key; listState.sortDir = 'asc'; }
+            renderList();
+          });
+          head.appendChild(th);
+
+          var fth = document.createElement('th');
+          fth.className = 'filter-cell';
+          fth.innerHTML = '<button type="button" class="col-filter-btn' + (active ? ' is-active' : '') + '" data-filter-col="' + col.key + '" aria-expanded="false" aria-label="Filtrar por ' + escapeHtml(col.label) + '"><i class="pi pi-filter-fill"></i></button>';
+          fth.querySelector('.col-filter-btn').addEventListener('click', function (e) {
+            e.stopPropagation();
+            openFilterPopover(col, this);
+          });
+          filterRow.appendChild(fth);
+        });
+
+        var actTh = document.createElement('th');
+        actTh.className = 'col-actions';
+        actTh.textContent = 'Acciones';
+        head.appendChild(actTh);
+        var actF = document.createElement('th');
+        actF.className = 'col-actions filter-cell';
+        filterRow.appendChild(actF);
+      }
+
+      function renderListBody() {
+        var filtered = getFilteredConsolidations();
+        var totalPages = Math.max(1, Math.ceil(filtered.length / listState.pageSize));
+        if (listState.page > totalPages) listState.page = totalPages;
+        var start = (listState.page - 1) * listState.pageSize;
+        var pageRows = filtered.slice(start, start + listState.pageSize);
+
+        var summaryEl = document.getElementById('listSummary');
+        summaryEl.textContent = recordsSummary(start + 1, Math.min(start + listState.pageSize, filtered.length), filtered.length);
+
+        var visibleCols = LIST_COLUMNS.filter(function (c) { return c.visible; });
+        var totalColSpan = visibleCols.length + 2; /* expander + acciones */
+        var body = document.getElementById('listTableBody');
+        body.innerHTML = '';
+
+        if (!pageRows.length) {
+          var tr = document.createElement('tr');
+          var td = document.createElement('td');
+          td.colSpan = totalColSpan;
+          td.textContent = 'No hay consolidaciones para mostrar.';
+          td.style.textAlign = 'center';
+          td.style.padding = '2rem';
+          tr.appendChild(td);
+          body.appendChild(tr);
+        } else {
+          pageRows.forEach(function (row) {
+            var tr = document.createElement('tr');
+            var isExpanded = !!expandedRows[row.id];
+            var expTd = document.createElement('td');
+            expTd.className = 'expander-cell';
+            expTd.innerHTML = '<button type="button" class="row-expander" data-expand="' + row.id + '" aria-label="Expandir"><i class="pi ' + (isExpanded ? 'pi-chevron-down' : 'pi-chevron-right') + '"></i></button>';
+            tr.appendChild(expTd);
+            visibleCols.forEach(function (col) {
+              var td = document.createElement('td');
+              td.textContent = cellValue(row, col.key);
+              tr.appendChild(td);
+            });
+            var actTd = document.createElement('td');
+            actTd.className = 'col-actions';
+            actTd.innerHTML =
+              '<div class="row-actions">' +
+                '<button type="button" class="table-action-btn" data-action="detail" data-id="' + row.id + '" data-tooltip="Ver detalle" aria-label="Ver detalle"><i class="pi pi-eye"></i></button>' +
+                '<button type="button" class="table-action-btn table-action-btn--danger" data-action="revert" data-id="' + row.id + '" data-tooltip="Revertir consolidado" aria-label="Revertir consolidado"><i class="pi pi-undo"></i></button>' +
+              '</div>';
+            tr.appendChild(actTd);
+            body.appendChild(tr);
+
+            if (isExpanded) {
+              var exTr = document.createElement('tr');
+              exTr.className = 'expand-row';
+              var exTd = document.createElement('td');
+              exTd.colSpan = totalColSpan;
+              exTd.innerHTML = '<div class="expand-inner">' + renderChildrenTable(row) + '</div>';
+              exTr.appendChild(exTd);
+              body.appendChild(exTr);
+            }
+          });
+        }
+        renderPagination(totalPages);
+      }
+
+      function renderChildrenTable(cons) {
+        var children = (cons.childrenIds || []).map(function (id) { return Store.orderById(id); }).filter(Boolean);
+        var rowsHtml = children.map(function (o) {
+          return '<tr>' +
+            '<td>' + escapeHtml(o.id) + '</td>' +
+            '<td>' + escapeHtml(o.nombre) + '</td>' +
+            '<td>' + escapeHtml(o.version) + '</td>' +
+            '<td>' + escapeHtml(consignatarioName(o.consignatario)) + '</td>' +
+            '<td>' + escapeHtml(deptName(o.departamento)) + '</td>' +
+            '<td>' + escapeHtml(o.estado) + '</td>' +
+          '</tr>';
+        }).join('');
+        return '<div class="expand-head">' +
+            '<span class="expand-head__count">' + recordsSummary(children.length ? 1 : 0, children.length, children.length) + '</span>' +
+            '<span class="expand-head__title">Órdenes de ' + escapeHtml(cons.id) + '</span>' +
+          '</div>' +
+          '<table class="detail-dept-table"><thead><tr>' +
+          '<th>Id</th><th>Nombre</th><th>Versión</th><th>Consignatario</th><th>Departamento</th><th>Estado</th>' +
+          '</tr></thead><tbody>' + (rowsHtml || '<tr><td colspan="6" style="text-align:center;padding:1rem;">Sin órdenes asociadas.</td></tr>') + '</tbody></table>';
+      }
+
+      function renderPagination(totalPages) {
+        var pager = document.querySelector('#listView .table-paginator');
+        if (pager) pager.style.display = totalPages > 1 ? '' : 'none';
+        document.getElementById('pagFirst').disabled = listState.page <= 1;
+        document.getElementById('pagPrev').disabled = listState.page <= 1;
+        document.getElementById('pagNext').disabled = listState.page >= totalPages;
+        document.getElementById('pagLast').disabled = listState.page >= totalPages;
+        var pages = document.getElementById('pagPages');
+        pages.innerHTML = '';
+        for (var i = 1; i <= totalPages; i++) {
+          var btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'table-pag-btn' + (i === listState.page ? ' is-active' : '');
+          btn.textContent = i;
+          btn.addEventListener('click', (function (p) { return function () { listState.page = p; renderListBody(); }; })(i));
+          pages.appendChild(btn);
+        }
+      }
+
+      function renderList() {
+        renderListHead();
+        renderListBody();
+      }
+
+      /* ---------- Mostrar/Ocultar columnas (enlace + checkboxes en línea + Aplicar) ---------- */
+      function buildColChooser(panelId, columns, onChange) {
+        var panel = document.getElementById(panelId);
+        panel.innerHTML = '';
+        var items = document.createElement('div');
+        items.className = 'col-chooser-inline__items';
+        columns.forEach(function (col, idx) {
+          var label = document.createElement('label');
+          label.className = 'col-chooser-inline__item';
+          var cb = document.createElement('input');
+          cb.type = 'checkbox';
+          cb.checked = col.visible;
+          cb.dataset.colIndex = idx;
+          var span = document.createElement('span');
+          span.textContent = col.label;
+          label.appendChild(cb);
+          label.appendChild(span);
+          items.appendChild(label);
+          cb.addEventListener('change', updateApplyState);
+        });
+        panel.appendChild(items);
+        var apply = document.createElement('button');
+        apply.type = 'button';
+        apply.className = 'btn btn-success';
+        apply.textContent = 'Aplicar';
+        panel.appendChild(apply);
+
+        function updateApplyState() {
+          var any = Array.prototype.some.call(items.querySelectorAll('input'), function (c) { return c.checked; });
+          apply.disabled = !any;
+        }
+        apply.addEventListener('click', function () {
+          items.querySelectorAll('input').forEach(function (cb) {
+            columns[Number(cb.dataset.colIndex)].visible = cb.checked;
+          });
+          onChange();
+          panel.classList.add('hidden');
+          var link = document.querySelector('[aria-controls="' + panelId + '"]');
+          if (link) link.setAttribute('aria-expanded', 'false');
+        });
+        updateApplyState();
+      }
+
+      function setupChooserToggle(linkId, panelId, rebuild) {
+        var link = document.getElementById(linkId);
+        var panel = document.getElementById(panelId);
+        link.addEventListener('click', function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          var willOpen = panel.classList.contains('hidden');
+          document.querySelectorAll('.col-chooser-inline__panel').forEach(function (p) { p.classList.add('hidden'); });
+          document.querySelectorAll('.col-chooser-link').forEach(function (b) { b.setAttribute('aria-expanded', 'false'); });
+          if (willOpen) {
+            if (rebuild) rebuild();
+            panel.classList.remove('hidden');
+            link.setAttribute('aria-expanded', 'true');
+          }
+        });
+      }
+
+      /* ================================================================
+         POPOVER DE FILTRO
+      ================================================================ */
+      var filterCtx = null;
+      var filterBtn = null;
+      var fp = {
+        root: document.getElementById('filterPopover'),
+        op: document.getElementById('filterPopoverOp'),
+        value: document.getElementById('filterPopoverValue'),
+        hint: document.getElementById('filterPopoverHint'),
+        error: document.getElementById('filterPopoverError'),
+        clear: document.getElementById('filterPopoverClear'),
+        apply: document.getElementById('filterPopoverApply')
+      };
+
+      fp.op.innerHTML = FILTER_OPS.map(function (o) { return '<option value="' + o.id + '">' + o.label + '</option>'; }).join('');
+
+      function currentValueValid() {
+        var op = fp.op.value;
+        var raw = fp.value.value;
+        if (op === 'unode') {
+          return raw.split('\t').map(function (t) { return t.trim(); }).filter(Boolean).length > 0;
+        }
+        return raw.trim() !== '';
+      }
+
+      function refreshApplyState() {
+        fp.apply.disabled = !currentValueValid();
+      }
+
+      function updateHint() {
+        if (fp.op.value === 'unode') fp.hint.textContent = 'Separa los términos con la tecla Tab (\\t). Ej.: valor1 [Tab] valor2';
+        else fp.hint.textContent = '';
+      }
+
+      function openFilterPopover(col, btn) {
+        if (filterBtn) filterBtn.classList.remove('is-open');
+        filterCtx = col;
+        filterBtn = btn;
+        btn.classList.add('is-open');
+        btn.setAttribute('aria-expanded', 'true');
+        var f = listState.filters[col.key];
+        fp.op.value = (f && f.op) || 'contiene';
+        fp.value.value = (f && f.value) || '';
+        fp.error.hidden = true; fp.error.textContent = '';
+        updateHint();
+        refreshApplyState();
+        fp.clear.disabled = false;
+        fp.root.classList.remove('hidden');
+        var rect = btn.getBoundingClientRect();
+        var top = rect.bottom + window.scrollY + 6;
+        var left = rect.left + window.scrollX;
+        var width = fp.root.offsetWidth || 288;
+        if (left + width > window.scrollX + document.documentElement.clientWidth - 8) {
+          left = window.scrollX + document.documentElement.clientWidth - width - 8;
+        }
+        fp.root.style.top = top + 'px';
+        fp.root.style.left = Math.max(8, left) + 'px';
+        fp.value.focus();
+      }
+
+      function closeFilterPopover() {
+        fp.root.classList.add('hidden');
+        if (filterBtn) { filterBtn.classList.remove('is-open'); filterBtn.setAttribute('aria-expanded', 'false'); }
+        filterBtn = null;
+        filterCtx = null;
+      }
+
+      fp.op.addEventListener('change', function () { updateHint(); fp.error.hidden = true; refreshApplyState(); });
+      fp.value.addEventListener('input', function () { fp.error.hidden = true; refreshApplyState(); });
+      fp.value.addEventListener('keydown', function (e) {
+        if (e.key === 'Tab' && fp.op.value === 'unode') {
+          e.preventDefault();
+          var s = this.selectionStart, en = this.selectionEnd;
+          this.value = this.value.slice(0, s) + '\t' + this.value.slice(en);
+          this.selectionStart = this.selectionEnd = s + 1;
+          refreshApplyState();
+        }
+      });
+
+      fp.apply.addEventListener('click', function () {
+        if (!filterCtx) return;
+        var raw = fp.value.value;
+        var isEmpty = fp.op.value === 'unode'
+          ? raw.split('\t').map(function (t) { return t.trim(); }).filter(Boolean).length === 0
+          : raw.trim() === '';
+        if (isEmpty) { fp.error.textContent = 'El campo no puede estar vacío.'; fp.error.hidden = false; return; }
+        /* Evitar múltiples ejecuciones. */
+        fp.apply.disabled = true;
+        fp.clear.disabled = true;
+        listState.filters[filterCtx.key] = { op: fp.op.value, value: raw, active: true };
+        listState.page = 1;
+        renderList();
+        fp.clear.disabled = false; /* Limpiar siempre habilitado */
+        closeFilterPopover();
+      });
+
+      fp.clear.addEventListener('click', function () {
+        if (!filterCtx) return;
+        fp.apply.disabled = true;
+        fp.clear.disabled = true;
+        delete listState.filters[filterCtx.key];
+        fp.value.value = '';
+        fp.error.hidden = true;
+        listState.page = 1;
+        renderList();
+        fp.clear.disabled = false;
+        closeFilterPopover();
+      });
+
+      document.addEventListener('click', function (e) {
+        if (fp.root.classList.contains('hidden')) return;
+        if (e.target.closest('#filterPopover')) return;
+        if (e.target.closest('.col-filter-btn')) return;
+        closeFilterPopover();
+      });
+
+      /* ================================================================
+         CREAR CONSOLIDACIÓN (tabla única con selección directa)
+      ================================================================ */
+      var ORDER_COLUMNS = [
+        { key: 'id', label: 'Id', visible: true },
+        { key: 'nombre', label: 'Nombre', visible: true },
+        { key: 'version', label: 'Versión', visible: true },
+        { key: 'estado', label: 'Estado', visible: true },
+        { key: 'createdAt', label: 'Creado', visible: true },
+        { key: 'updatedAt', label: 'Actualizado', visible: true },
+        { key: 'updatedBy', label: 'Actualizado por', visible: true },
+        { key: 'consignatarioNombre', label: 'Consignatario', visible: false },
+        { key: 'departamentoNombre', label: 'Departamento', visible: false },
+        { key: 'unidad', label: 'Unidad', visible: false }
+      ];
+      var availSelected = {};     /* selección de órdenes a consolidar */
+
+      function decorateOrder(o) {
+        return Object.assign({}, o, {
+          consignatarioNombre: consignatarioName(o.consignatario),
+          departamentoNombre: deptName(o.departamento)
+        });
+      }
+
+      function availableForCreate() {
+        /* Todas las órdenes registradas. */
+        return registeredOrders();
+      }
+      function selectedOrders() {
+        return Object.keys(availSelected).map(function (id) { return Store.orderById(id); }).filter(Boolean);
+      }
+
+      function orderCellValue(row, key) {
+        if (DATE_KEYS.indexOf(key) >= 0) return formatDateTime(row[key]);
+        return row[key] == null ? '' : String(row[key]);
+      }
+
+      function renderOrderTableHead(headEl, columns, allCheckId, hasSelectAll) {
+        headEl.innerHTML = '';
+        var chkTh = document.createElement('th');
+        chkTh.className = 'check-cell';
+        if (hasSelectAll) chkTh.innerHTML = '<input type="checkbox" class="sel-checkbox" id="' + allCheckId + '" aria-label="Seleccionar todas">';
+        headEl.appendChild(chkTh);
+        columns.forEach(function (col) {
+          if (!col.visible) return;
+          var th = document.createElement('th');
+          th.textContent = col.label;
+          headEl.appendChild(th);
+        });
+      }
+
+      function renderAvailTable() {
+        renderOrderTableHead(document.getElementById('availTableHead'), ORDER_COLUMNS, 'availSelectAll', true);
+        var rows = availableForCreate();
+        var body = document.getElementById('availTableBody');
+        var visibleCols = ORDER_COLUMNS.filter(function (c) { return c.visible; });
+        body.innerHTML = '';
+
+        var selectableCount = 0;
+        if (!rows.length) {
+          body.innerHTML = '<tr><td colspan="' + (visibleCols.length + 1) + '" style="text-align:center;padding:1.5rem;">No hay órdenes registradas.</td></tr>';
+        } else {
+          rows.forEach(function (o) {
+            var dec = decorateOrder(o);
+            var consolidated = isOrderConsolidated(o);
+            if (!consolidated) selectableCount++;
+            var tr = document.createElement('tr');
+            tr.className = 'selectable-row' + (consolidated ? ' is-consolidated' : '');
+            var chkTd = document.createElement('td');
+            chkTd.className = 'check-cell';
+            if (consolidated) {
+              chkTd.innerHTML = '<i class="pi pi-lock" title="Orden ya consolidada" style="color:#adb5bd"></i>';
+            } else {
+              chkTd.innerHTML = '<input type="checkbox" class="sel-checkbox" data-avail="' + o.id + '"' + (availSelected[o.id] ? ' checked' : '') + '>';
+            }
+            tr.appendChild(chkTd);
+            visibleCols.forEach(function (col) {
+              var td = document.createElement('td');
+              td.textContent = orderCellValue(dec, col.key);
+              tr.appendChild(td);
+            });
+            body.appendChild(tr);
+          });
+        }
+
+        var summary = document.getElementById('availSummary');
+        summary.textContent = recordsSummary(rows.length ? 1 : 0, rows.length, rows.length);
+
+        /* wiring */
+        body.querySelectorAll('[data-avail]').forEach(function (cb) {
+          cb.addEventListener('change', function () {
+            if (cb.checked) availSelected[cb.dataset.avail] = true; else delete availSelected[cb.dataset.avail];
+            syncAvailSelectAll(selectableCount);
+            updateCreateButtons();
+          });
+        });
+        var all = document.getElementById('availSelectAll');
+        if (all) {
+          all.disabled = selectableCount === 0;
+          all.addEventListener('change', function () {
+            availSelected = {};
+            if (all.checked) {
+              availableForCreate().forEach(function (o) { if (!isOrderConsolidated(o)) availSelected[o.id] = true; });
+            }
+            renderAvailTable();
+            updateCreateButtons();
+          });
+        }
+        syncAvailSelectAll(selectableCount);
+        updateCreateButtons();
+      }
+
+      function syncAvailSelectAll(selectableCount) {
+        var all = document.getElementById('availSelectAll');
+        if (!all) return;
+        var sel = Object.keys(availSelected).length;
+        all.checked = selectableCount > 0 && sel === selectableCount;
+        all.indeterminate = sel > 0 && sel < selectableCount;
+      }
+
+      function updateCreateButtons() {
+        document.getElementById('consolidateBtn').disabled = Object.keys(availSelected).length < 2;
+      }
+
+      function openCreate() {
+        availSelected = {};
+        renderAvailTable();
+        updateCreateButtons();
+        showView('create');
+      }
+
+      /* ---------- Reglas de consolidación ---------- */
+      document.getElementById('consolidateBtn').addEventListener('click', function () {
+        var orders = selectedOrders();
+        if (orders.length < 2) return;
+
+        var consignatarios = orders.map(function (o) { return o.consignatario; });
+        var uniqueCons = consignatarios.filter(function (v, i) { return consignatarios.indexOf(v) === i; });
+        if (uniqueCons.length > 1) {
+          showToast('Solo se permiten órdenes del mismo consignatario. Revisa las órdenes seleccionadas.', 'No es posible consolidar', 'error');
+          return;
+        }
+        var departamentos = orders.map(function (o) { return o.departamento; });
+        var uniqueDep = departamentos.filter(function (v, i) { return departamentos.indexOf(v) === i; });
+        if (uniqueDep.length > 1) {
+          showToast('Todas las órdenes deben pertenecer al mismo departamento. Revisa las órdenes seleccionadas.', 'No es posible consolidar', 'error');
+          return;
+        }
+        openPreview(orders);
+      });
+
+      var previewData = null;
+      function openPreview(orders) {
+        var folio = nextFolio();
+        var first = orders[0];
+        previewData = {
+          folio: folio,
+          consignatario: first.consignatario,
+          departamento: first.departamento,
+          unidad: first.unidad,
+          childrenIds: orders.map(function (o) { return o.id; })
+        };
+        var childrenRows = orders.map(function (o) {
+          return '<tr><td>' + escapeHtml(o.id) + '</td><td>' + escapeHtml(o.nombre) + '</td><td>' + escapeHtml(o.version) + '</td><td>' + escapeHtml(o.estado) + '</td></tr>';
+        }).join('');
+        var body = document.getElementById('previewModalBody');
+        body.innerHTML =
+          '<div class="preview-block">' +
+            '<div class="preview-block__title">Nueva orden consolidada</div>' +
+            '<table class="detail-table"><tbody>' +
+              '<tr><th>Nombre / Folio</th><td>' + escapeHtml(folio) + '</td></tr>' +
+              '<tr><th>Estado</th><td>Activa</td></tr>' +
+              '<tr><th>Consignatario</th><td>' + escapeHtml(consignatarioName(first.consignatario)) + '</td></tr>' +
+              '<tr><th>Departamento</th><td>' + escapeHtml(deptName(first.departamento)) + '</td></tr>' +
+              '<tr><th>Unidad</th><td>' + escapeHtml(first.unidad) + '</td></tr>' +
+              '<tr><th>Órdenes consolidadas</th><td>' + orders.length + '</td></tr>' +
+            '</tbody></table>' +
+          '</div>' +
+          '<div class="preview-block">' +
+            '<div class="preview-block__title">Órdenes incluidas</div>' +
+            '<table class="detail-dept-table"><thead><tr><th>Id</th><th>Nombre</th><th>Versión</th><th>Estado</th></tr></thead><tbody>' + childrenRows + '</tbody></table>' +
+          '</div>' +
+          '<p style="font-size:0.875rem;color:#334155;margin-top:0.5rem">' + escapeHtml(MSG.MSG045) + '</p>';
+        document.getElementById('previewModal').classList.remove('hidden');
+      }
+
+      function closePreview() { document.getElementById('previewModal').classList.add('hidden'); previewData = null; }
+
+      document.getElementById('previewCancelBtn').addEventListener('click', function () {
+        /* Respuesta negativa: no se realiza la consolidación, sin cambios de estatus. */
+        closePreview();
+      });
+
+      document.getElementById('previewConfirmBtn').addEventListener('click', function () {
+        if (!previewData) return;
+        var data = Store.load();
+        var now = new Date().toISOString();
+        var folio = previewData.folio;
+        /* Crea la nueva orden consolidada ligada a las órdenes hijas. */
+        data.consolidations.push({
+          id: folio,
+          nombre: folio,
+          estado: 'Activa',
+          unidad: previewData.unidad,
+          consignatario: previewData.consignatario,
+          departamento: previewData.departamento,
+          childrenIds: previewData.childrenIds.slice(),
+          createdAt: now,
+          updatedAt: now,
+          updatedBy: CURRENT_USER
+        });
+        /* Deshabilita las órdenes hijas y las asocia a la nueva orden. */
+        previewData.childrenIds.forEach(function (id) {
+          var o = data.orders.find(function (x) { return x.id === id; });
+          if (o) { o.prevEstado = o.estado; o.estado = 'Consolidada'; o.consolidatedInto = folio; o.updatedAt = now; o.updatedBy = CURRENT_USER; }
+        });
+        Store.save(data);
+        closePreview();
+        showToast(MSG.MSG046, '¡Listo!', 'success');
+        availSelected = {};
+        showView('list');
+      });
+
+      /* ================================================================
+         DETALLE
+      ================================================================ */
+      var lastDetailId = null;
+
+      function openDetail(id) {
+        var cons = Store.consolidationById(id);
+        if (!cons) return;
+        lastDetailId = id;
+        renderDetail(cons);
+        document.getElementById('detailPageTitle').textContent = 'Detalle de consolidación ' + id;
+        document.getElementById('detailBreadcrumbCurrent').textContent = 'Detalle de ' + id;
+        showView('detail');
+      }
+
+      function renderDetail(cons) {
+        var rows = [
+          ['Id', escapeHtml(cons.id)],
+          ['Nombre', escapeHtml(cons.nombre)],
+          ['Estado', escapeHtml(cons.estado)],
+          ['Unidad', escapeHtml(cons.unidad)],
+          ['Consignatario', escapeHtml(consignatarioName(cons.consignatario))],
+          ['Departamento', escapeHtml(deptName(cons.departamento))],
+          ['Actualizado por', escapeHtml(cons.updatedBy || '—')],
+          ['Actualizado', escapeHtml(formatDateTimeLong(cons.updatedAt))],
+          ['Creado', escapeHtml(formatDateTimeLong(cons.createdAt))]
+        ];
+        var tableHtml = '<table class="detail-table"><tbody>' +
+          rows.map(function (r) { return '<tr><th>' + r[0] + '</th><td>' + r[1] + '</td></tr>'; }).join('') +
+          '</tbody></table>';
+
+        var children = (cons.childrenIds || []).map(function (id) { return Store.orderById(id); }).filter(Boolean);
+        var childRows = children.map(function (o) {
+          return '<tr>' +
+            '<td>' + escapeHtml(o.id) + '</td>' +
+            '<td>' + escapeHtml(o.nombre) + '</td>' +
+            '<td>' + escapeHtml(o.version) + '</td>' +
+            '<td>' + escapeHtml(o.estado) + '</td>' +
+            '<td>' + escapeHtml(consignatarioName(o.consignatario)) + '</td>' +
+            '<td>' + escapeHtml(deptName(o.departamento)) + '</td>' +
+            '<td>' + escapeHtml(formatDateTime(o.createdAt)) + '</td>' +
+          '</tr>';
+        }).join('');
+        var childHtml =
+          '<div class="detail-count">' + recordsSummary(children.length ? 1 : 0, children.length, children.length) + '</div>' +
+          '<table class="detail-dept-table"><thead><tr>' +
+            '<th>Id</th><th>Nombre</th><th>Versión</th><th>Estado</th><th>Consignatario</th><th>Departamento</th><th>Creado</th>' +
+          '</tr></thead><tbody>' + (children.length ? childRows : '<tr><td colspan="7" style="text-align:center;padding:1.5rem;">Sin órdenes asociadas.</td></tr>') + '</tbody></table>';
+
+        document.getElementById('detailFormRoot').innerHTML = tableHtml + '<h2 class="section-title" style="margin:1.5rem 0 0.75rem">Órdenes consolidadas</h2>' + childHtml;
+      }
+
+      /* ================================================================
+         REVERTIR CONSOLIDADO
+      ================================================================ */
+      var revertingId = null;
+
+      function openRevert(id) {
+        var cons = Store.consolidationById(id);
+        if (!cons) return;
+        revertingId = id;
+        document.getElementById('revertModalTitle').textContent = 'Revertir consolidado ' + id;
+        document.getElementById('revertModalBody').innerHTML = escapeHtml(MSG.MSG047);
+        document.getElementById('revertModal').classList.remove('hidden');
+      }
+      function closeRevert() { document.getElementById('revertModal').classList.add('hidden'); revertingId = null; }
+
+      document.getElementById('revertCancelBtn').addEventListener('click', function () {
+        /* Respuesta negativa: se mantiene la orden consolidada. */
+        closeRevert();
+      });
+      document.getElementById('revertConfirmBtn').addEventListener('click', function () {
+        if (!revertingId) { closeRevert(); return; }
+        var data = Store.load();
+        var cons = data.consolidations.find(function (c) { return c.id === revertingId; });
+        if (cons) {
+          var now = new Date().toISOString();
+          /* Reactiva las órdenes originales. */
+          (cons.childrenIds || []).forEach(function (id) {
+            var o = data.orders.find(function (x) { return x.id === id; });
+            if (o) { o.estado = o.prevEstado || 'Registrada'; o.consolidatedInto = null; delete o.prevEstado; o.updatedAt = now; o.updatedBy = CURRENT_USER; }
+          });
+          /* Elimina la orden consolidada (el folio queda libre para reúso). */
+          data.consolidations = data.consolidations.filter(function (c) { return c.id !== revertingId; });
+          Store.save(data);
+        }
+        closeRevert();
+        showToast(MSG.MSG048, '¡Listo!', 'success');
+        showView('list');
+      });
+
+      /* ================================================================
+         EXPORTAR
+      ================================================================ */
+      var EXPORT_FORMATS = [
+        { id: 'html', label: 'HTML', icon: 'pi-file', color: 'blue' },
+        { id: 'csv', label: 'CSV', icon: 'pi-file', color: 'blue' },
+        { id: 'text', label: 'Text', icon: 'pi-file', color: 'grey' },
+        { id: 'pdf', label: 'PDF', icon: 'pi-file-pdf', color: 'red' },
+        { id: 'xls', label: 'Excel 95 +', icon: 'pi-file-excel', color: 'green' },
+        { id: 'xlsx', label: 'Excel 2007 +', icon: 'pi-file-excel', color: 'green' }
+      ];
+      function buildExportMenu() {
+        var panel = document.getElementById('exportMenuPanel');
+        panel.innerHTML = '';
+        EXPORT_FORMATS.forEach(function (fmt) {
+          var item = document.createElement('button');
+          item.type = 'button';
+          item.className = 'export-menu__item';
+          item.setAttribute('role', 'menuitem');
+          item.innerHTML = '<i class="pi ' + fmt.icon + ' export-menu__icon--' + fmt.color + '"></i><span>' + fmt.label + '</span>';
+          item.addEventListener('click', function () { closeExportMenu(); exportRecords(fmt.id); });
+          panel.appendChild(item);
+        });
+      }
+      function closeExportMenu() {
+        document.getElementById('exportMenuPanel').classList.add('hidden');
+        document.getElementById('exportBtn').setAttribute('aria-expanded', 'false');
+      }
+      function exportRecords(format) {
+        var rows = getFilteredConsolidations();
+        var cols = LIST_COLUMNS.filter(function (c) { return c.visible; });
+        var headers = cols.map(function (c) { return c.label; });
+        var lines = rows.map(function (r) { return cols.map(function (c) { return cellValue(r, c.key); }); });
+        var filename = 'consolidacion-ordenes';
+        var blob;
+        if (format === 'csv' || format === 'xls' || format === 'xlsx') {
+          var csv = [headers.join(',')].concat(lines.map(function (l) { return l.map(function (v) { return '"' + String(v).replace(/"/g, '""') + '"'; }).join(','); })).join('\n');
+          blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' });
+          filename += format === 'xlsx' ? '.xlsx' : (format === 'xls' ? '.xls' : '.csv');
+        } else if (format === 'html') {
+          var html = '<html><head><meta charset="utf-8"></head><body><table border="1"><thead><tr>' + headers.map(function (h) { return '<th>' + h + '</th>'; }).join('') + '</tr></thead><tbody>' + lines.map(function (l) { return '<tr>' + l.map(function (v) { return '<td>' + v + '</td>'; }).join('') + '</tr>'; }).join('') + '</tbody></table></body></html>';
+          blob = new Blob([html], { type: 'text/html;charset=utf-8' }); filename += '.html';
+        } else if (format === 'text') {
+          var txt = [headers.join('\t')].concat(lines.map(function (l) { return l.join('\t'); })).join('\n');
+          blob = new Blob([txt], { type: 'text/plain;charset=utf-8' }); filename += '.txt';
+        } else {
+          var pdfTxt = 'Consolidación de órdenes\n\n' + [headers.join(' | ')].concat(lines.map(function (l) { return l.join(' | '); })).join('\n');
+          blob = new Blob([pdfTxt], { type: 'application/pdf' }); filename += '.pdf';
+        }
+        var a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = filename;
+        a.click();
+        URL.revokeObjectURL(a.href);
+      }
+
+      /* ================================================================
+         EVENTOS GLOBALES
+      ================================================================ */
+      document.getElementById('goCreateBtn').addEventListener('click', openCreate);
+      document.getElementById('detailRevertBtn').addEventListener('click', function () { if (lastDetailId) openRevert(lastDetailId); });
+
+      document.querySelectorAll('[data-nav="list"]').forEach(function (el) {
+        el.addEventListener('click', function (e) { e.preventDefault(); showView('list'); });
+      });
+
+      document.getElementById('listTableBody').addEventListener('click', function (e) {
+        var exp = e.target.closest('[data-expand]');
+        if (exp) {
+          var id = exp.dataset.expand;
+          expandedRows[id] = !expandedRows[id];
+          renderListBody();
+          return;
+        }
+        var btn = e.target.closest('[data-action]');
+        if (!btn) return;
+        var id = btn.dataset.id;
+        if (btn.dataset.action === 'detail') openDetail(id);
+        else if (btn.dataset.action === 'revert') openRevert(id);
+      });
+
+      /* Toolbar toggles */
+      setupChooserToggle('listColChooserBtn', 'listColChooserPanel', function () { buildColChooser('listColChooserPanel', LIST_COLUMNS, renderList); });
+
+      document.getElementById('exportBtn').addEventListener('click', function (e) {
+        e.stopPropagation();
+        var panel = document.getElementById('exportMenuPanel');
+        var willOpen = panel.classList.contains('hidden');
+        panel.classList.toggle('hidden');
+        document.getElementById('exportBtn').setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+      });
+
+      document.addEventListener('click', function (e) {
+        if (!e.target.closest('.export-menu')) closeExportMenu();
+        if (!e.target.closest('.col-chooser-inline') && !e.target.closest('.col-chooser-inline__panel')) {
+          document.querySelectorAll('.col-chooser-inline__panel').forEach(function (p) { p.classList.add('hidden'); });
+          document.querySelectorAll('.col-chooser-link').forEach(function (b) { b.setAttribute('aria-expanded', 'false'); });
+        }
+      });
+
+      document.getElementById('pageSizeSelect').addEventListener('change', function () {
+        listState.pageSize = Number(this.value);
+        listState.page = 1;
+        renderListBody();
+      });
+      document.getElementById('pagFirst').addEventListener('click', function () { listState.page = 1; renderListBody(); });
+      document.getElementById('pagPrev').addEventListener('click', function () { listState.page--; renderListBody(); });
+      document.getElementById('pagNext').addEventListener('click', function () { listState.page++; renderListBody(); });
+      document.getElementById('pagLast').addEventListener('click', function () {
+        listState.page = Math.ceil(getFilteredConsolidations().length / listState.pageSize) || 1;
+        renderListBody();
+      });
+
+      window.addEventListener('resize', closeFilterPopover);
+      window.addEventListener('scroll', function () { if (!fp.root.classList.contains('hidden')) closeFilterPopover(); }, true);
+
+      /* ---------- Tooltip flotante ---------- */
+      var tooltipEl = document.createElement('div');
+      tooltipEl.className = 'app-tooltip';
+      tooltipEl.setAttribute('role', 'tooltip');
+      document.body.appendChild(tooltipEl);
+
+      function showTooltip(target) {
+        var text = target.getAttribute('data-tooltip');
+        if (!text) return;
+        tooltipEl.textContent = text;
+        tooltipEl.style.display = 'block';
+        var r = target.getBoundingClientRect();
+        var tw = tooltipEl.offsetWidth;
+        var th = tooltipEl.offsetHeight;
+        var gap = 8;
+        var placement = 'top';
+        var top = r.top - th - gap;
+        if (top < 4) { placement = 'bottom'; top = r.bottom + gap; }
+        var left = r.left + (r.width / 2) - (tw / 2);
+        left = Math.max(6, Math.min(left, document.documentElement.clientWidth - tw - 6));
+        tooltipEl.setAttribute('data-placement', placement);
+        tooltipEl.style.top = top + 'px';
+        tooltipEl.style.left = left + 'px';
+        tooltipEl.classList.add('is-visible');
+      }
+      function hideTooltip() {
+        tooltipEl.classList.remove('is-visible');
+      }
+      document.addEventListener('mouseover', function (e) {
+        var t = e.target.closest('[data-tooltip]');
+        if (t) showTooltip(t);
+      });
+      document.addEventListener('mouseout', function (e) {
+        if (e.target.closest('[data-tooltip]')) hideTooltip();
+      });
+      document.addEventListener('focusin', function (e) {
+        var t = e.target.closest('[data-tooltip]');
+        if (t) showTooltip(t);
+      });
+      document.addEventListener('focusout', hideTooltip);
+
+      /* ---------- Init ---------- */
+      Store.load();
+      buildExportMenu();
+      renderList();
+    })();
+  </script>
+</body>
+</html>
