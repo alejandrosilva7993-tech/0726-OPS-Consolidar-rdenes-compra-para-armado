@@ -322,11 +322,33 @@
     .selectable-row.is-consolidated td { background: #f5f6f8 !important; color: #9aa4b2; }
     .selectable-row.is-consolidated:hover td { background: #f0f1f3 !important; }
 
-    .badge { display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.15rem 0.55rem; border-radius: 999px; font-size: 0.72rem; font-weight: 600; white-space: nowrap; }
-    .badge--active { background: #e6f4ea; color: #1e7e34; }
-    .badge--registrada { background: #e7f1ff; color: #0a58ca; }
-    .badge--consolidada { background: #f1f3f5; color: #6c757d; }
-    .badge--revertida { background: #fdeaea; color: #b02a37; }
+    .status-chip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.4rem 0.85rem;
+      border-radius: 0.375rem;
+      font-size: 0.875rem;
+      font-weight: 400;
+      line-height: 1.2;
+      white-space: nowrap;
+      border: 1px solid transparent;
+    }
+    .status-chip__dot {
+      width: 0.5rem;
+      height: 0.5rem;
+      border-radius: 50%;
+      flex-shrink: 0;
+      background: currentColor;
+    }
+    .status-chip--active { background: #d1e7dd; color: #0a3622; border-color: #a3cfbb; }
+    .status-chip--registrada { background: #cfe2ff; color: #052c65; border-color: #9ec5fe; }
+    .status-chip--consolidada { background: #e2e3e5; color: #2b2f32; border-color: #c4c8cb; }
+    .status-chip--revertida, .status-chip--error { background: #f8d7da; color: #58151c; border-color: #f1aeb5; }
+    .status-chip--neutral { background: #e9ecef; color: #343a40; border-color: #ced4da; }
+    .data-table td.status-cell, .detail-dept-table td.status-cell { text-align: center; }
+    .detail-table td.status-cell { text-align: left; }
 
     .table-paginator { display: flex; align-items: center; justify-content: center; padding: 0.85rem 0 0; border-top: none; background: transparent; }
     .table-paginator__cluster { display: inline-flex; align-items: center; gap: 0; }
@@ -747,6 +769,26 @@
         });
       }
 
+      function estadoChipClass(estado) {
+        var map = {
+          'Activa': 'status-chip--active',
+          'Registrada': 'status-chip--registrada',
+          'Consolidada': 'status-chip--consolidada',
+          'Revertida': 'status-chip--revertida',
+          'Error': 'status-chip--error'
+        };
+        return map[estado] || 'status-chip--neutral';
+      }
+
+      function estadoChip(estado) {
+        var label = escapeHtml(estado == null ? '' : String(estado));
+        if (!label) return '—';
+        return '<span class="status-chip ' + estadoChipClass(estado) + '">' +
+          '<span class="status-chip__dot" aria-hidden="true"></span>' +
+          '<span class="status-chip__label">' + label + '</span>' +
+        '</span>';
+      }
+
       /* ---------- Toast ---------- */
       function showToast(detail, summary, severity) {
         severity = severity || 'success';
@@ -935,7 +977,12 @@
             tr.appendChild(expTd);
             visibleCols.forEach(function (col) {
               var td = document.createElement('td');
-              td.textContent = cellValue(row, col.key);
+              if (col.key === 'estado') {
+                td.className = 'status-cell';
+                td.innerHTML = estadoChip(row.estado);
+              } else {
+                td.textContent = cellValue(row, col.key);
+              }
               tr.appendChild(td);
             });
             var actTd = document.createElement('td');
@@ -971,7 +1018,7 @@
             '<td>' + escapeHtml(o.version) + '</td>' +
             '<td>' + escapeHtml(consignatarioName(o.consignatario)) + '</td>' +
             '<td>' + escapeHtml(deptName(o.departamento)) + '</td>' +
-            '<td>' + escapeHtml(o.estado) + '</td>' +
+            '<td class="status-cell">' + estadoChip(o.estado) + '</td>' +
           '</tr>';
         }).join('');
         return '<div class="expand-head">' +
@@ -1262,7 +1309,12 @@
             tr.appendChild(chkTd);
             visibleCols.forEach(function (col) {
               var td = document.createElement('td');
-              td.textContent = orderCellValue(dec, col.key);
+              if (col.key === 'estado') {
+                td.className = 'status-cell';
+                td.innerHTML = estadoChip(o.estado);
+              } else {
+                td.textContent = orderCellValue(dec, col.key);
+              }
               tr.appendChild(td);
             });
             body.appendChild(tr);
@@ -1347,7 +1399,7 @@
           childrenIds: orders.map(function (o) { return o.id; })
         };
         var childrenRows = orders.map(function (o) {
-          return '<tr><td>' + escapeHtml(o.id) + '</td><td>' + escapeHtml(o.nombre) + '</td><td>' + escapeHtml(o.version) + '</td><td>' + escapeHtml(o.estado) + '</td></tr>';
+          return '<tr><td>' + escapeHtml(o.id) + '</td><td>' + escapeHtml(o.nombre) + '</td><td>' + escapeHtml(o.version) + '</td><td class="status-cell">' + estadoChip(o.estado) + '</td></tr>';
         }).join('');
         var body = document.getElementById('previewModalBody');
         body.innerHTML =
@@ -1355,7 +1407,7 @@
             '<div class="preview-block__title">Nueva orden consolidada</div>' +
             '<table class="detail-table"><tbody>' +
               '<tr><th>Nombre / Folio</th><td>' + escapeHtml(folio) + '</td></tr>' +
-              '<tr><th>Estado</th><td>Activa</td></tr>' +
+              '<tr><th>Estado</th><td class="status-cell">' + estadoChip('Activa') + '</td></tr>' +
               '<tr><th>Consignatario</th><td>' + escapeHtml(consignatarioName(first.consignatario)) + '</td></tr>' +
               '<tr><th>Departamento</th><td>' + escapeHtml(deptName(first.departamento)) + '</td></tr>' +
               '<tr><th>Unidad</th><td>' + escapeHtml(first.unidad) + '</td></tr>' +
@@ -1424,18 +1476,20 @@
 
       function renderDetail(cons) {
         var rows = [
-          ['Id', escapeHtml(cons.id)],
-          ['Nombre', escapeHtml(cons.nombre)],
-          ['Estado', escapeHtml(cons.estado)],
-          ['Unidad', escapeHtml(cons.unidad)],
-          ['Consignatario', escapeHtml(consignatarioName(cons.consignatario))],
-          ['Departamento', escapeHtml(deptName(cons.departamento))],
-          ['Actualizado por', escapeHtml(cons.updatedBy || '—')],
-          ['Actualizado', escapeHtml(formatDateTimeLong(cons.updatedAt))],
-          ['Creado', escapeHtml(formatDateTimeLong(cons.createdAt))]
+          ['Id', escapeHtml(cons.id), ''],
+          ['Nombre', escapeHtml(cons.nombre), ''],
+          ['Estado', estadoChip(cons.estado), 'status-cell'],
+          ['Unidad', escapeHtml(cons.unidad), ''],
+          ['Consignatario', escapeHtml(consignatarioName(cons.consignatario)), ''],
+          ['Departamento', escapeHtml(deptName(cons.departamento)), ''],
+          ['Actualizado por', escapeHtml(cons.updatedBy || '—'), ''],
+          ['Actualizado', escapeHtml(formatDateTimeLong(cons.updatedAt)), ''],
+          ['Creado', escapeHtml(formatDateTimeLong(cons.createdAt)), '']
         ];
         var tableHtml = '<table class="detail-table"><tbody>' +
-          rows.map(function (r) { return '<tr><th>' + r[0] + '</th><td>' + r[1] + '</td></tr>'; }).join('') +
+          rows.map(function (r) {
+            return '<tr><th>' + r[0] + '</th><td' + (r[2] ? ' class="' + r[2] + '"' : '') + '>' + r[1] + '</td></tr>';
+          }).join('') +
           '</tbody></table>';
 
         var children = (cons.childrenIds || []).map(function (id) { return Store.orderById(id); }).filter(Boolean);
@@ -1444,7 +1498,7 @@
             '<td>' + escapeHtml(o.id) + '</td>' +
             '<td>' + escapeHtml(o.nombre) + '</td>' +
             '<td>' + escapeHtml(o.version) + '</td>' +
-            '<td>' + escapeHtml(o.estado) + '</td>' +
+            '<td class="status-cell">' + estadoChip(o.estado) + '</td>' +
             '<td>' + escapeHtml(consignatarioName(o.consignatario)) + '</td>' +
             '<td>' + escapeHtml(deptName(o.departamento)) + '</td>' +
             '<td>' + escapeHtml(formatDateTime(o.createdAt)) + '</td>' +
