@@ -534,7 +534,10 @@
           <div class="card">
             <div class="data-table-scroll-pane">
               <table class="data-table" id="availTable">
-                <thead><tr class="header-row" id="availTableHead"></tr></thead>
+                <thead>
+                  <tr class="header-row" id="availTableHead"></tr>
+                  <tr class="filter-row" id="availTableFilterRow"></tr>
+                </thead>
                 <tbody id="availTableBody"></tbody>
               </table>
             </div>
@@ -831,7 +834,6 @@
         { key: 'id', label: 'Id', visible: true },
         { key: 'nombre', label: 'Nombre', visible: true },
         { key: 'estado', label: 'Estado', visible: true },
-        { key: 'unidad', label: 'Unidad', visible: true },
         { key: 'updatedBy', label: 'Actualizado por', visible: true },
         { key: 'updatedAt', label: 'Actualizado', visible: true },
         { key: 'createdAt', label: 'Creado', visible: true }
@@ -929,7 +931,10 @@
           fth.innerHTML = '<button type="button" class="col-filter-btn' + (active ? ' is-active' : '') + '" data-filter-col="' + col.key + '" aria-expanded="false" aria-label="Filtrar por ' + escapeHtml(col.label) + '"><i class="pi pi-filter-fill"></i></button>';
           fth.querySelector('.col-filter-btn').addEventListener('click', function (e) {
             e.stopPropagation();
-            openFilterPopover(col, this);
+            openFilterPopover(col, this, {
+              filters: listState.filters,
+              onApply: function () { listState.page = 1; renderList(); }
+            });
           });
           filterRow.appendChild(fth);
         });
@@ -1149,13 +1154,16 @@
         else fp.hint.textContent = '';
       }
 
-      function openFilterPopover(col, btn) {
+      var filterTarget = null; /* { filters, onApply } */
+
+      function openFilterPopover(col, btn, target) {
         if (filterBtn) filterBtn.classList.remove('is-open');
         filterCtx = col;
         filterBtn = btn;
+        filterTarget = target || { filters: listState.filters, onApply: function () { listState.page = 1; renderList(); } };
         btn.classList.add('is-open');
         btn.setAttribute('aria-expanded', 'true');
-        var f = listState.filters[col.key];
+        var f = filterTarget.filters[col.key];
         fp.op.value = (f && f.op) || 'contiene';
         fp.value.value = (f && f.value) || '';
         fp.error.hidden = true; fp.error.textContent = '';
@@ -1180,6 +1188,7 @@
         if (filterBtn) { filterBtn.classList.remove('is-open'); filterBtn.setAttribute('aria-expanded', 'false'); }
         filterBtn = null;
         filterCtx = null;
+        filterTarget = null;
       }
 
       fp.op.addEventListener('change', function () { updateHint(); fp.error.hidden = true; refreshApplyState(); });
@@ -1195,7 +1204,7 @@
       });
 
       fp.apply.addEventListener('click', function () {
-        if (!filterCtx) return;
+        if (!filterCtx || !filterTarget) return;
         var raw = fp.value.value;
         var isEmpty = fp.op.value === 'unode'
           ? raw.split('\t').map(function (t) { return t.trim(); }).filter(Boolean).length === 0
@@ -1204,22 +1213,20 @@
         /* Evitar múltiples ejecuciones. */
         fp.apply.disabled = true;
         fp.clear.disabled = true;
-        listState.filters[filterCtx.key] = { op: fp.op.value, value: raw, active: true };
-        listState.page = 1;
-        renderList();
+        filterTarget.filters[filterCtx.key] = { op: fp.op.value, value: raw, active: true };
+        filterTarget.onApply();
         fp.clear.disabled = false; /* Limpiar siempre habilitado */
         closeFilterPopover();
       });
 
       fp.clear.addEventListener('click', function () {
-        if (!filterCtx) return;
+        if (!filterCtx || !filterTarget) return;
         fp.apply.disabled = true;
         fp.clear.disabled = true;
-        delete listState.filters[filterCtx.key];
+        delete filterTarget.filters[filterCtx.key];
         fp.value.value = '';
         fp.error.hidden = true;
-        listState.page = 1;
-        renderList();
+        filterTarget.onApply();
         fp.clear.disabled = false;
         closeFilterPopover();
       });
@@ -1243,10 +1250,10 @@
         { key: 'updatedAt', label: 'Actualizado', visible: true },
         { key: 'updatedBy', label: 'Actualizado por', visible: true },
         { key: 'consignatarioNombre', label: 'Consignatario', visible: false },
-        { key: 'departamentoNombre', label: 'Departamento', visible: false },
-        { key: 'unidad', label: 'Unidad', visible: false }
+        { key: 'departamentoNombre', label: 'Departamento', visible: false }
       ];
       var availSelected = {};     /* selección de órdenes a consolidar */
+      var availState = { filters: {} };
 
       function decorateOrder(o) {
         return Object.assign({}, o, {
@@ -1268,23 +1275,55 @@
         return row[key] == null ? '' : String(row[key]);
       }
 
-      function renderOrderTableHead(headEl, columns, allCheckId, hasSelectAll) {
+      function getFilteredAvailableOrders() {
+        return availableForCreate().filter(function (o) {
+          var dec = decorateOrder(o);
+          return ORDER_COLUMNS.every(function (col) {
+            var f = availState.filters[col.key];
+            if (!f || !f.active) return true;
+            return matchFilter(orderCellValue(dec, col.key), f.op, f.value);
+          });
+        });
+      }
+
+      function renderAvailTableHead() {
+        var headEl = document.getElementById('availTableHead');
+        var filterRow = document.getElementById('availTableFilterRow');
         headEl.innerHTML = '';
+        filterRow.innerHTML = '';
+
         var chkTh = document.createElement('th');
         chkTh.className = 'check-cell';
-        if (hasSelectAll) chkTh.innerHTML = '<input type="checkbox" class="sel-checkbox" id="' + allCheckId + '" aria-label="Seleccionar todas">';
+        chkTh.innerHTML = '<input type="checkbox" class="sel-checkbox" id="availSelectAll" aria-label="Seleccionar todas">';
         headEl.appendChild(chkTh);
-        columns.forEach(function (col) {
+        var chkF = document.createElement('th');
+        chkF.className = 'check-cell filter-cell';
+        filterRow.appendChild(chkF);
+
+        ORDER_COLUMNS.forEach(function (col) {
           if (!col.visible) return;
           var th = document.createElement('th');
           th.textContent = col.label;
           headEl.appendChild(th);
+
+          var active = availState.filters[col.key] && availState.filters[col.key].active;
+          var fth = document.createElement('th');
+          fth.className = 'filter-cell';
+          fth.innerHTML = '<button type="button" class="col-filter-btn' + (active ? ' is-active' : '') + '" data-filter-col="' + col.key + '" aria-expanded="false" aria-label="Filtrar por ' + escapeHtml(col.label) + '"><i class="pi pi-filter-fill"></i></button>';
+          fth.querySelector('.col-filter-btn').addEventListener('click', function (e) {
+            e.stopPropagation();
+            openFilterPopover(col, this, {
+              filters: availState.filters,
+              onApply: function () { renderAvailTable(); }
+            });
+          });
+          filterRow.appendChild(fth);
         });
       }
 
       function renderAvailTable() {
-        renderOrderTableHead(document.getElementById('availTableHead'), ORDER_COLUMNS, 'availSelectAll', true);
-        var rows = availableForCreate();
+        renderAvailTableHead();
+        var rows = getFilteredAvailableOrders();
         var body = document.getElementById('availTableBody');
         var visibleCols = ORDER_COLUMNS.filter(function (c) { return c.visible; });
         body.innerHTML = '';
@@ -1328,7 +1367,7 @@
         body.querySelectorAll('[data-avail]').forEach(function (cb) {
           cb.addEventListener('change', function () {
             if (cb.checked) availSelected[cb.dataset.avail] = true; else delete availSelected[cb.dataset.avail];
-            syncAvailSelectAll(selectableCount);
+            syncAvailSelectAll(selectableCount, rows);
             updateCreateButtons();
           });
         });
@@ -1336,22 +1375,25 @@
         if (all) {
           all.disabled = selectableCount === 0;
           all.addEventListener('change', function () {
-            availSelected = {};
-            if (all.checked) {
-              availableForCreate().forEach(function (o) { if (!isOrderConsolidated(o)) availSelected[o.id] = true; });
-            }
+            /* Selecciona/deselecciona solo las filas visibles (filtradas). */
+            rows.forEach(function (o) {
+              if (isOrderConsolidated(o)) return;
+              if (all.checked) availSelected[o.id] = true;
+              else delete availSelected[o.id];
+            });
             renderAvailTable();
             updateCreateButtons();
           });
         }
-        syncAvailSelectAll(selectableCount);
+        syncAvailSelectAll(selectableCount, rows);
         updateCreateButtons();
       }
 
-      function syncAvailSelectAll(selectableCount) {
+      function syncAvailSelectAll(selectableCount, filteredRows) {
         var all = document.getElementById('availSelectAll');
         if (!all) return;
-        var sel = Object.keys(availSelected).length;
+        var rows = filteredRows || [];
+        var sel = rows.filter(function (o) { return !isOrderConsolidated(o) && availSelected[o.id]; }).length;
         all.checked = selectableCount > 0 && sel === selectableCount;
         all.indeterminate = sel > 0 && sel < selectableCount;
       }
@@ -1362,6 +1404,7 @@
 
       function openCreate() {
         availSelected = {};
+        availState.filters = {};
         renderAvailTable();
         updateCreateButtons();
         showView('create');
@@ -1395,7 +1438,6 @@
           folio: folio,
           consignatario: first.consignatario,
           departamento: first.departamento,
-          unidad: first.unidad,
           childrenIds: orders.map(function (o) { return o.id; })
         };
         var childrenRows = orders.map(function (o) {
@@ -1410,7 +1452,6 @@
               '<tr><th>Estado</th><td class="status-cell">' + estadoChip('Activa') + '</td></tr>' +
               '<tr><th>Consignatario</th><td>' + escapeHtml(consignatarioName(first.consignatario)) + '</td></tr>' +
               '<tr><th>Departamento</th><td>' + escapeHtml(deptName(first.departamento)) + '</td></tr>' +
-              '<tr><th>Unidad</th><td>' + escapeHtml(first.unidad) + '</td></tr>' +
               '<tr><th>Órdenes consolidadas</th><td>' + orders.length + '</td></tr>' +
             '</tbody></table>' +
           '</div>' +
@@ -1439,7 +1480,6 @@
           id: folio,
           nombre: folio,
           estado: 'Activa',
-          unidad: previewData.unidad,
           consignatario: previewData.consignatario,
           departamento: previewData.departamento,
           childrenIds: previewData.childrenIds.slice(),
@@ -1479,7 +1519,6 @@
           ['Id', escapeHtml(cons.id), ''],
           ['Nombre', escapeHtml(cons.nombre), ''],
           ['Estado', estadoChip(cons.estado), 'status-cell'],
-          ['Unidad', escapeHtml(cons.unidad), ''],
           ['Consignatario', escapeHtml(consignatarioName(cons.consignatario)), ''],
           ['Departamento', escapeHtml(deptName(cons.departamento)), ''],
           ['Actualizado por', escapeHtml(cons.updatedBy || '—'), ''],
